@@ -1,0 +1,77 @@
+{
+  "_comment": "Routes are tried in order. Status checked 2026-10-11: allbirds.com serves a live UCP profile (MCP transport); etsy/wayfair/target/walmart return 404 for public /.well-known/ucp, so they fall through to universal checkout. Any domain not listed here is auto-discovered (UCP first, so every Shopify store works).",
+  "merchants": [
+    {
+      "id": "allbirds",
+      "name": "Allbirds",
+      "domains": ["allbirds.com", "weareallbirds.myshopify.com"],
+      "region": "US",
+      "routes": [{ "protocol": "ucp" }, { "protocol": "rye" }],
+      "agentPolicy": "allowed",
+      "notes": "Shopify store. Live UCP over MCP; pays via Shop Pay / Google Pay / Shopify card handler, so completion hands off to the buyer unless a Stripe handler is offered."
+    },
+    {
+      "id": "etsy",
+      "name": "Etsy",
+      "domains": ["etsy.com"],
+      "region": "US",
+      "routes": [{ "protocol": "ucp" }, { "protocol": "rye" }, { "protocol": "computer_use" }],
+      "agentPolicy": "unknown",
+      "notes": "UCP co-developer; UCP checkout is live inside Google AI Mode/Gemini but no public agent endpoint yet."
+    },
+    {
+      "id": "wayfair",
+      "name": "Wayfair",
+      "domains": ["wayfair.com"],
+      "region": "US",
+      "routes": [{ "protocol": "ucp" }, { "protocol": "rye" }, { "protocol": "computer_use" }],
+      "agentPolicy": "unknown",
+      "notes": "UCP co-developer; live in Google surfaces, no public discovery yet."
+    },
+    {
+      "id": "target",
+      "name": "Target",
+      "domains": ["target.com"],
+      "region": "US",
+      "routes": [{ "protocol": "ucp" }, { "protocol": "rye" }, { "protocol": "computer_use" }],
+      "agentPolicy": "unknown",
+      "notes": "UCP co-developer, rollout announced. Until public discovery appears, routed via universal checkout."
+    },
+    {
+      "id": "walmart",
+      "name": "Walmart",
+      "domains": ["walmart.com"],
+      "region": "US",
+      "routes": [{ "protocol": "ucp" }, { "protocol": "rye" }, { "protocol": "computer_use" }],
+      "agentPolicy": "unknown",
+      "notes": "UCP co-developer; also an ACP partner inside ChatGPT. No public agent endpoint yet."
+    },
+    {
+      "id": "amazon",
+      "name": "Amazon",
+      "domains": ["amazon.com"],
+      "region": "US",
+      "routes": [{ "protocol": "rye" }],
+      "agentPolicy": "prohibited",
+      "notes": "No agent checkout API, and Amazon's terms prohibit unauthorized automated agents, so computer-use is disabled here. Rye only (check Rye's current Amazon support)."
+    },
+    {
+      "id": "bestbuy",
+      "name": "Best Buy",
+      "domains": ["bestbuy.com"],
+      "region": "US",
+      "routes": [{ "protocol": "rye" }, { "protocol": "computer_use" }],
+      "agentPolicy": "unknown",
+      "notes": "Public Products API is read-only; purchases go through universal checkout."
+    },
+    {
+      "id": "ebay",
+      "name": "eBay",
+      "domains": ["ebay.com"],
+      "region": "US",
+      "routes": [{ "protocol": "rye" }, { "protocol": "computer_use" }],
+      "agentPolicy": "unknown",
+      "notes": "eBay Buy APIs (Order API) require partner approval; add an adapter once approved."
+    }
+  ]
+}

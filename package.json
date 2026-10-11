@@ -1,0 +1,21 @@
+{
+  "name": "merchant-router",
+  "version": "0.1.0",
+  "description": "One API for AI agents to buy from any merchant: routes across UCP, ACP, universal checkout and computer-use with fallbacks and spend guardrails.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/server.ts",
+    "mcp": "node src/mcp.ts",
+    "demo": "node scripts/demo.ts",
+    "test": "node --test test/*.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}
