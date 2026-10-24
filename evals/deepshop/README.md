@@ -14,12 +14,13 @@ A judge grades each requirement separately; a task passes only if all of them pa
 
 ## What we ran
 
-A 10-task pilot (every 15th task: all 5 categories, easy and medium only; no hard tasks), two systems on the same tasks:
+A 10-task pilot (every 15th task: all 5 categories, easy and medium only; no hard tasks), three systems on the same tasks:
 
 - **Ours** (`ours.ts`): the search pipeline below.
 - **Baseline** (`baseline.ts`): Claude Opus 5.5 with web search and web fetch, told to shop on Amazon. This stands in for how agents shop today.
+- **Browser Use** (`browser_use/run.py`): the open-source [browser-use](https://github.com/browser-use/browser-use) agent (0.13) driving a real headless Chromium on live Amazon, like the web agents in the paper. It runs on Claude Opus 5, not 5.5: browser-use forces a tool call on every step, which Opus 5.5 rejects. We set `use_thinking=False` because Opus 5 refuses to fill browser-use's `thinking` output field. Told to stop rather than solve a CAPTCHA.
 
-**Judge** (`judge.ts`): the paper's judge prompt word for word, with one change. The paper's judge looks at screenshots of the agent browsing; we don't browse, so the judge gets data from the chosen product's Amazon page instead, fetched independently of both systems. The judge model is Claude Opus 5.5 rather than GPT-4o (no OpenAI key yet). Report results as "DeepShop (product-page judge)".
+**Judge** (`judge.ts`): the paper's judge prompt word for word, with one change. The paper's judge looks at screenshots of the agent browsing; we don't browse, so the judge gets data from the chosen product's Amazon page instead, fetched independently of every system. The judge model is Claude Opus 5.5 rather than GPT-4o (no OpenAI key yet). Report results as "DeepShop (product-page judge)".
 
 ## Results (pilot, 10/150 tasks, 2026-10-24)
 
@@ -27,9 +28,12 @@ A 10-task pilot (every 15th task: all 5 categories, easy and medium only; no har
 |---|---|---|---|---|---|---|
 | **Ours** | **40%** | 70% | 50% | 20% | **~6k** | 35s |
 | Baseline (Claude + web search) | 20% | 30% | 50% | 40% | ~99k | 51s |
+| Browser Use (Opus 5, real browser) | 30% | 33% | 71% | 50% | ~380k | 105s |
 | Paper's best published | 32% | | | | | |
 
-About 2x the success rate at about 1/16 the tokens. Ten tasks is directional, not a result.
+About the same or better success than either agent at 1/16 to 1/60 of the tokens. Browser Use cost $13.44 in API fees for the 10 tasks (about $1.34 per task). Amazon showed it a CAPTCHA on 1 of 10 tasks (`Amazon--54`), which counts as a failure; its other per-requirement rates are over the 9 tasks it finished. One task hit a browser start-up timeout on our machine and was re-run. Ten tasks is directional, not a result.
+
+The Ours row predates the relevance-search change in `ours.ts` (`97efb05`); re-run it before quoting these numbers.
 
 ## How our pipeline works
 
@@ -54,6 +58,15 @@ Needs `ANTHROPIC_API_KEY` and `RAINFOREST_API_KEY` in `.env`. Rainforest respons
 node --env-file=.env evals/deepshop/run.ts --pilot            # 10 tasks, both systems
 node --env-file=.env evals/deepshop/run.ts --system ours      # all 150, ours only
 node --env-file=.env evals/deepshop/run.ts --pilot --report   # print the table without running
+```
+
+Browser Use runs from Python (3.12) with its own Chromium:
+
+```bash
+uv venv -p 3.12 .venv-bu && VIRTUAL_ENV=.venv-bu uv pip install browser-use && .venv-bu/bin/browser-use install
+set -a; . ./.env; set +a
+BROWSER_PATH="<path to Chromium binary>" .venv-bu/bin/python evals/deepshop/browser_use/run.py --pilot
+node --env-file=.env evals/deepshop/run.ts --pilot --judge-pending   # judge its answers, print the table
 ```
 
 Answers and verdicts append to `results/`; finished tasks are skipped on re-run.

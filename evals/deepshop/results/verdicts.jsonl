@@ -18,3 +18,12 @@
 {"taskId":"Amazon--92","system":"baseline","dims":{"attribute":true,"filter":true,"sort":true},"success":true,"judgeTokens":6815}
 {"taskId":"Amazon--306","system":"baseline","dims":{"attribute":false,"filter":false,"sort":false},"success":false,"judgeTokens":8027}
 {"taskId":"Amazon--330","system":"baseline","dims":{"attribute":true,"filter":true,"sort":false},"success":false,"judgeTokens":8853}
+{"taskId":"Amazon--66","system":"browser_use","dims":{"attribute":false},"success":false,"judgeTokens":3327}
+{"taskId":"Amazon--268","system":"browser_use","dims":{"attribute":true,"filter":true,"sort":true},"success":true,"judgeTokens":8429}
+{"taskId":"Amazon--31","system":"browser_use","dims":{"attribute":false,"filter":false},"success":false,"judgeTokens":6429}
+{"taskId":"Amazon--355","system":"browser_use","dims":{"attribute":false,"filter":true},"success":false,"judgeTokens":4662}
+{"taskId":"Amazon--306","system":"browser_use","dims":{"attribute":false,"filter":false,"sort":false},"success":false,"judgeTokens":0}
+{"taskId":"Amazon--296","system":"browser_use","dims":{"attribute":false,"filter":true},"success":false,"judgeTokens":4170}
+{"taskId":"Amazon--79","system":"browser_use","dims":{"attribute":true},"success":true,"judgeTokens":4090}
+{"taskId":"Amazon--330","system":"browser_use","dims":{"attribute":false,"filter":true,"sort":false},"success":false,"judgeTokens":8487}
+{"taskId":"Amazon--92","system":"browser_use","dims":{"attribute":true,"filter":true,"sort":true},"success":true,"judgeTokens":8692}

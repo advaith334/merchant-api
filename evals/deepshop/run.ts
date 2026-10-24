@@ -1,4 +1,5 @@
-// Usage: node --env-file=.env evals/deepshop/run.ts [--system ours|baseline|all] [--pilot | --limit N] [--report]
+// Usage: node --env-file=.env evals/deepshop/run.ts [--system ours|baseline|all] [--pilot | --limit N] [--report | --judge-pending]
+// --judge-pending judges answers written by other runners (browser_use/run.py) that have no verdict yet.
 // Results append to evals/deepshop/results/{answers,verdicts}.jsonl; finished tasks are skipped on re-run.
 
 import { parseArgs } from "node:util";
@@ -13,6 +14,7 @@ const { values: args } = parseArgs({
     pilot: { type: "boolean", default: false },
     limit: { type: "string" },
     report: { type: "boolean", default: false },
+    "judge-pending": { type: "boolean", default: false },
     concurrency: { type: "string", default: "3" },
   },
 });
@@ -20,6 +22,7 @@ const { values: args } = parseArgs({
 const ANSWERS = new URL("./results/answers.jsonl", import.meta.url);
 const VERDICTS = new URL("./results/verdicts.jsonl", import.meta.url);
 const SYSTEMS: Record<string, (t: Task) => Promise<Answer>> = { ours: runOurs, baseline: runBaseline };
+const REPORTED = [...Object.keys(SYSTEMS), "browser_use"];
 
 let tasks = loadTasks();
 if (args.pilot) tasks = tasks.filter((_, i) => i % 15 === 0); // 10 tasks spread over categories and difficulties
@@ -31,7 +34,16 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   await Promise.all(Array.from({ length: n }, async () => { for (let x; (x = queue.shift()); ) await fn(x); }));
 }
 
-if (!args.report) {
+if (args["judge-pending"]) {
+  const byId = new Map(tasks.map((t) => [t.id, t]));
+  const judged = new Set(readJsonl<Verdict>(VERDICTS).map((v) => `${v.system}:${v.taskId}`));
+  const pending = readJsonl<Answer>(ANSWERS).filter((a) => !a.error && byId.has(a.taskId) && !judged.has(`${a.system}:${a.taskId}`));
+  await pool(pending, Number(args.concurrency), async (a) => {
+    const v = await judge(byId.get(a.taskId)!, a);
+    appendJsonl(VERDICTS, v);
+    console.log(`judge ${a.system} ${a.taskId} ${v.success ? "SUCCESS" : "NOT SUCCESS"} ${JSON.stringify(v.dims)}`);
+  });
+} else if (!args.report) {
   for (const system of systems) {
     const done = new Set(readJsonl<Answer>(ANSWERS).filter((a) => a.system === system && !a.error).map((a) => a.taskId));
     await pool(tasks.filter((t) => !done.has(t.id)), Number(args.concurrency), async (task) => {
@@ -62,7 +74,7 @@ const answers = latest(readJsonl<Answer>(ANSWERS));
 const verdicts = latest(readJsonl<Verdict>(VERDICTS));
 const median = (xs: number[]) => { const s = [...xs].sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : 0; };
 
-const rows = Object.keys(SYSTEMS).map((system) => {
+const rows = REPORTED.map((system) => {
   const a = [...answers.values()].filter((x) => x.system === system && !x.error);
   const v = a.map((x) => verdicts.get(`${system}:${x.taskId}`)).filter(Boolean) as Verdict[];
   if (!a.length) return null;
