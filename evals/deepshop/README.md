@@ -14,7 +14,7 @@ A judge grades each requirement separately; a task passes only if all of them pa
 
 ## What we ran
 
-A 10-task pilot (every 15th task: all 5 categories, all 3 difficulties), two systems on the same tasks:
+A 10-task pilot (every 15th task: all 5 categories, easy and medium only; no hard tasks), two systems on the same tasks:
 
 - **Ours** (`ours.ts`): the search pipeline below.
 - **Baseline** (`baseline.ts`): Claude Opus 5.5 with web search and web fetch, told to shop on Amazon. This stands in for how agents shop today.
