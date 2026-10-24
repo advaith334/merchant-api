@@ -64,7 +64,19 @@ pre { margin: 0; background: var(--code-bg); padding: 14px 16px; border-radius: 
   </header>
 
   <section>
-    <p>Agents that shop today search the web and read product pages. This is slow, expensive and often wrong. We take a shopping request, turn it into a structured product search, check a short list of candidates against their product pages, and return one product. Checkout goes through whichever protocol the merchant supports.</p>
+    <p>Agents shop on infrastructure built for people. They either drive a browser, one screenshot at a time, or read search results that were never meant to support a purchase. Both are slow, expensive and often wrong. Smarter models do not fix this. Better data does.</p>
+    <p>We take a shopping request, turn it into a structured product search, check a short list of candidates against their product pages, and return one product. Checkout goes through whichever protocol the merchant supports.</p>
+  </section>
+
+  <section>
+    <h2>The problem</h2>
+    <p><em>Browser agents</em> take a screenshot, decide where to click, wait for the page, and repeat, often hundreds of times per purchase. Each screenshot costs 1,000–1,800 tokens (<a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Anthropic</a>). The agent sees only the 10–20 listings that fit on a screen, in the order the site chooses, and stops at pop-ups, captchas and login walls.</p>
+    <ul>
+      <li>Across 16 agents, the best took 2.7–4.3× more steps than a person (<a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a>).</li>
+      <li>On DeepShop, the agents Microsoft tested completed 11.6–32% of shopping tasks (<a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">Microsoft Research</a>).</li>
+      <li>On WebMall, models working from screenshots completed 0–2 of 8 purchases. Given the page's structure instead, they reached 62.5% (<a href="https://wbsg-uni-mannheim.github.io/WebMall/">WebMall</a>).</li>
+    </ul>
+    <p><em>Search APIs</em> are faster but built for reading the web. Prices, stock and delivery times change by the hour, and an index lags behind. Search can describe a product but cannot buy it. And nobody stands behind the data, so the agent re-checks everything itself.</p>
   </section>
 
   <section>
@@ -113,6 +125,19 @@ pre { margin: 0; background: var(--code-bg); padding: 14px 16px; border-radius: 
   <section>
     <h2>Checkout</h2>
     <p>For each merchant we try the available routes in order and fall back on failure: UCP (Shopify and Google), ACP (OpenAI and Stripe), a universal checkout provider for any product URL, and a browser as a last resort. Spend limits are enforced outside the agent, and the merchant receives a single-use payment token capped at the order total.</p>
+  </section>
+
+  <section>
+    <h2>Where this goes</h2>
+    <p>With complete, current data over goods and services, an agent could:</p>
+    <ul>
+      <li>find the right product in under a second, instead of 10–40 minutes;</li>
+      <li>consider every listing for a need, not the first page of results;</li>
+      <li>match a person's taste, not only their filters;</li>
+      <li>know when to buy, from how a price is moving;</li>
+      <li>judge products by how satisfied buyers actually are, beyond star ratings;</li>
+      <li>handle returns, and buy with safety nets such as a cool-down window.</li>
+    </ul>
   </section>
 
   <section>
