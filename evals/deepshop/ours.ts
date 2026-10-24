@@ -38,10 +38,18 @@ export async function runOurs(task: Task): Promise<Answer> {
   tally(planMsg);
   const plan = planMsg.parsed_output!;
 
-  // 2. One search, then apply the numeric filters ourselves.
-  const search = await rainforest({ type: "search", search_term: plan.search_term, sort_by: plan.sort_by });
-  calls++;
-  const all = (search.search_results ?? []).map(trimSearchResult).filter((r: any) => r.asin);
+  // 2. Search by relevance (plus Amazon's own sort when one is asked for: a bare
+  // price sort surfaces junk listings), then apply the numeric filters ourselves.
+  const sorts = plan.sort_by === "featured" ? ["featured"] : ["featured", plan.sort_by];
+  const seen = new Set<string>();
+  const all: any[] = [];
+  for (const sort_by of sorts) {
+    const search = await rainforest({ type: "search", search_term: plan.search_term, sort_by });
+    calls++;
+    for (const r of (search.search_results ?? []).map(trimSearchResult)) {
+      if (r.asin && !seen.has(r.asin)) { seen.add(r.asin); all.push(r); }
+    }
+  }
   const passes = (r: any) =>
     (plan.min_price == null || (r.price != null && r.price >= plan.min_price)) &&
     (plan.max_price == null || (r.price != null && r.price <= plan.max_price)) &&
@@ -49,7 +57,7 @@ export async function runOurs(task: Task): Promise<Answer> {
     (plan.min_reviews == null || (r.ratings_total != null && r.ratings_total >= plan.min_reviews)) &&
     (!plan.prime_only || r.is_prime);
   let pool = all.filter(passes);
-  if (pool.length === 0) pool = all;
+  if (pool.length === 0) pool = [...all].sort((a, b) => (b.ratings_total ?? 0) - (a.ratings_total ?? 0));
   if (plan.sort_by === "price_low_to_high") pool.sort((a: any, b: any) => (a.price ?? 1e9) - (b.price ?? 1e9));
   if (plan.sort_by === "price_high_to_low") pool.sort((a: any, b: any) => (b.price ?? -1) - (a.price ?? -1));
   if (plan.sort_by === "average_review") pool.sort((a: any, b: any) => (b.rating ?? 0) - (a.rating ?? 0) || (b.ratings_total ?? 0) - (a.ratings_total ?? 0));
