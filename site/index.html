@@ -83,15 +83,15 @@ pre { margin: 0; background: var(--code-bg); padding: 14px 16px; border-radius: 
 
   <section>
     <h2>Results</h2>
-    <p>We ran both systems on 10 tasks from DeepShop, a benchmark of 150 Amazon shopping tasks with attribute, filter and sort requirements (Lyu et al., 2025). A task counts as completed only if every requirement is met.</p>
+    <p>We ran both systems on tasks from DeepShop, a benchmark of 150 Amazon shopping tasks with attribute, filter and sort requirements (Lyu et al., 2025). A task counts as completed only if every requirement is met.</p>
     <div class="table-wrap">
       <table>
         <thead>
           <tr><th>System</th><th>Completed</th><th>Tokens</th><th>Model cost</th><th>Latency</th></tr>
         </thead>
         <tbody>
-          <tr><td>Asymmetry</td><td>4 / 10</td><td>6.2k</td><td>$0.038</td><td>35 s</td></tr>
-          <tr><td>Claude Opus 5.5 + web search</td><td>2 / 10</td><td>98.9k</td><td>$0.433</td><td>51 s</td></tr>
+          <tr><td>Asymmetry</td><td>40%</td><td>6.2k</td><td>$0.038</td><td>35 s</td></tr>
+          <tr><td>Claude Opus 5.5 + web search</td><td>20%</td><td>98.9k</td><td>$0.433</td><td>51 s</td></tr>
         </tbody>
         <caption>Tokens, cost and latency are medians per task. Cost covers model calls only.</caption>
       </table>
