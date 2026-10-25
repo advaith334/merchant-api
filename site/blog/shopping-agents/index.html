@@ -1,0 +1,449 @@
+<title>Intelligence over goods and services</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Agents are bad at buying things. Smarter models don't fix that. Better data does.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the home page's research-note column. Figures step out to a wider measure,
+   drawn with one accent (findings) and one warning red (failures); everything else is ink and grey. */
+:root {
+  --bg: #fdfdfc;
+  --fg: #1c1d1f;
+  --muted: #6b6e73;
+  --rule: #e2e3e0;
+  --fig: #f5f5f3;
+  --link: #2a4f8f;
+  --accent: #2a4f8f;
+  --accent-soft: #e4eaf4;
+  --bad: #b0412e;
+  --bad-soft: #f6e5e1;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --fig: #1d1e20;
+    --link: #8fb0e6; --accent: #8fb0e6; --accent-soft: #233046; --bad: #e0806c; --bad-soft: #3a2420; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --fig: #1d1e20;
+  --link: #8fb0e6; --accent: #8fb0e6; --accent-soft: #233046; --bad: #e0806c; --bad-soft: #3a2420; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 400 18px/1.65 var(--serif);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+article { max-width: 760px; margin: 0 auto; padding-block: 48px 112px; display: grid; gap: 22px; }
+article > * { min-width: 0; width: 100%; max-width: 640px; justify-self: center; }
+article > figure { max-width: none; }
+h1 { font: 600 1.85rem/1.2 var(--serif); margin: 0; text-wrap: balance; }
+h2 { font: 600 1.35rem/1.25 var(--serif); margin: 36px 0 0; text-wrap: balance; }
+h3 { font: 600 1.05rem/1.3 var(--serif); margin: 14px 0 0; }
+p, ul, ol, blockquote { margin: 0; }
+ul, ol { padding-left: 1.3em; display: grid; gap: 8px; }
+a { color: var(--link); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.muted { color: var(--muted); }
+.meta { font: 400 0.8rem/1.5 var(--mono); color: var(--muted); }
+.home { font: 400 0.8rem/1.5 var(--mono); color: var(--muted); text-decoration: none; }
+.home:hover { color: var(--fg); }
+blockquote { border-left: 2px solid var(--fg); padding: 2px 0 2px 18px; }
+.mono { font-family: var(--mono); }
+
+/* figures */
+figure { margin: 14px 0; display: grid; gap: 12px; }
+figure > * { min-width: 0; }
+figcaption { font: 400 0.82rem/1.5 var(--serif); color: var(--muted); max-width: 640px; justify-self: center; width: 100%; }
+figcaption b { color: var(--fg); font-weight: 600; }
+.fig-title { font: 600 0.95rem/1.35 var(--serif); }
+.label { font: 500 0.7rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.panel { background: var(--fig); border-radius: 4px; padding: 18px; }
+svg text { font-family: var(--mono); }
+
+/* contents */
+.parts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; counter-reset: part; }
+.part { display: grid; gap: 8px; align-content: start; padding: 16px; border-top: 2px solid var(--fg); background: var(--fig); text-decoration: none; color: inherit; }
+.part:hover h4 { text-decoration: underline; text-underline-offset: 2px; }
+.part.moon { border-top-color: var(--accent); }
+.part h4 { margin: 0; font: 600 1rem/1.3 var(--serif); }
+.part ul { list-style: none; padding: 0; gap: 4px; font: 400 0.8rem/1.45 var(--mono); color: var(--muted); }
+
+/* errands */
+.errands { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.errand { display: grid; gap: 0; align-content: start; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.errand .row { display: grid; grid-template-columns: 5.5em 1fr; gap: 12px; padding: 10px 14px; border-top: 1px dashed var(--rule); font-size: 0.9rem; }
+.errand .row:first-of-type { border-top: 0; }
+.errand .k { font: 500 0.7rem/1.9 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.errand header { padding: 12px 14px; background: var(--fig); display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.errand header b { font-weight: 600; }
+.miss { color: var(--bad); font: 500 0.75rem/1.4 var(--mono); }
+.x { color: var(--bad); }
+
+/* metadata */
+.meta-fig { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: center; }
+.card { border: 1px solid var(--fg); border-radius: 4px; padding: 12px; display: grid; gap: 8px; background: var(--bg); }
+.card .img { aspect-ratio: 4 / 3; max-width: 100%; background: repeating-linear-gradient(135deg, var(--fig) 0 8px, var(--rule) 8px 9px); border-radius: 2px; }
+.card .t { font-weight: 600; font-size: 0.92rem; }
+.card .s { font: 400 0.75rem/1.3 var(--mono); color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 400 0.8rem/1 var(--mono); padding: 7px 10px; border: 1px solid var(--accent); color: var(--fg); background: var(--accent-soft); border-radius: 2px; }
+
+/* flows */
+.flow { display: flex; align-items: stretch; gap: 0; }
+.flow .step { flex: 1 1 0; min-width: 0; border: 1px solid var(--rule); background: var(--bg); padding: 12px; display: grid; gap: 6px; align-content: start; border-radius: 4px; }
+.flow .step.hot { border-color: var(--accent); background: var(--accent-soft); }
+.flow .step.fail { border-color: var(--bad); background: var(--bad-soft); }
+.flow .step b { font-weight: 600; font-size: 0.95rem; }
+.flow .step span { font-size: 0.85rem; color: var(--muted); }
+.flow .arrow { flex: none; width: 28px; display: grid; place-items: center; color: var(--muted); font-family: var(--mono); }
+
+/* loop */
+.loop { width: 100%; max-width: 560px; height: auto; justify-self: center; display: block; margin: 0 auto; }
+.loop .box { fill: var(--bg); stroke: var(--muted); stroke-width: 1.25; }
+.loop .box.hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.loop .lbl { fill: var(--fg); font-size: 15px; }
+.loop .note { fill: var(--muted); font-size: 12.5px; }
+.loop .big { fill: var(--fg); font-size: 26px; font-weight: 500; }
+.loop .edge { stroke: var(--muted); stroke-width: 1.25; fill: none; }
+.loop .head { fill: var(--muted); }
+
+/* charts */
+.chart { display: grid; gap: 14px; }
+.bar-row { display: grid; gap: 5px; }
+.bar-row .name { display: flex; justify-content: space-between; gap: 12px; font-size: 0.88rem; }
+.bar-row .name .v { font: 500 0.82rem/1.6 var(--mono); font-variant-numeric: tabular-nums; }
+.track { position: relative; height: 12px; background: var(--rule); border-radius: 1px; }
+.fill { position: absolute; inset: 0 auto 0 0; background: var(--muted); border-radius: 1px; }
+.fill.best { background: var(--accent); }
+.axis { display: flex; justify-content: space-between; font: 400 0.72rem/1 var(--mono); color: var(--muted); padding-top: 2px; }
+.whisker-row { display: grid; grid-template-columns: 8.5em 1fr; gap: 14px; align-items: center; font-size: 0.88rem; }
+.wtrack { position: relative; height: 28px; }
+.wtrack .grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule); }
+.wtrack .range { position: absolute; top: 13px; height: 2px; background: var(--accent); }
+.wtrack .range::before, .wtrack .range::after { content: ""; position: absolute; top: -6px; width: 2px; height: 14px; background: var(--accent); }
+.wtrack .range::before { left: 0; } .wtrack .range::after { right: 0; }
+.wtrack .dot { position: absolute; top: 8px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--muted); }
+.wtrack .dot.hot { background: var(--accent); }
+.wtrack .val { position: absolute; top: 4px; font: 500 0.8rem/1.6 var(--mono); white-space: nowrap; }
+.waxis { display: grid; grid-template-columns: 8.5em 1fr; gap: 14px; }
+.waxis div { position: relative; height: 14px; font: 400 0.72rem/1 var(--mono); color: var(--muted); }
+.waxis span { position: absolute; transform: translateX(-50%); }
+
+/* one-way */
+.oneway { width: 100%; max-width: 620px; height: auto; display: block; margin: 0 auto; }
+.oneway .box { fill: var(--bg); stroke: var(--fg); stroke-width: 1.25; }
+.oneway .box.hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+.oneway .lbl { fill: var(--fg); font-size: 15px; }
+.oneway .note { fill: var(--muted); font-size: 12.5px; }
+.oneway .edge { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+.oneway .back { stroke: var(--bad); stroke-width: 1.5; fill: none; stroke-dasharray: 6 5; }
+.oneway .head { fill: var(--muted); }
+.oneway .bad { fill: var(--bad); }
+.oneway .xbg { fill: var(--bg); stroke: var(--bad); stroke-width: 1.5; }
+.oneway .xm { stroke: var(--bad); stroke-width: 2; stroke-linecap: round; }
+
+/* today vs what if */
+.vs { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.vs th, .vs td { text-align: left; padding: 11px 12px 11px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.vs th { font: 500 0.7rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.vs td:first-child { font: 500 0.82rem/1.6 var(--mono); color: var(--muted); width: 7em; }
+.vs td:nth-child(2) { color: var(--muted); }
+.vs td:nth-child(3) { font-weight: 600; }
+.vs th:nth-child(3) { color: var(--accent); }
+
+/* decision engine */
+.engine { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
+.engine > * { min-width: 0; }
+.engine ul { list-style: none; padding: 0; gap: 6px; }
+.engine li { font-size: 0.86rem; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 2px; background: var(--bg); }
+.engine .out li { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.core { display: grid; place-items: center; text-align: center; gap: 4px; width: 132px; height: 132px; border-radius: 50%; border: 2px solid var(--accent); background: var(--accent-soft); padding: 12px; }
+.core b { font-size: 1rem; }
+.core span { font: 400 0.72rem/1.3 var(--mono); color: var(--muted); }
+.engine .arrow { font-family: var(--mono); color: var(--muted); text-align: center; }
+
+@media (max-width: 680px) {
+  .parts, .errands { grid-template-columns: 1fr; }
+  .meta-fig { grid-template-columns: 1fr; }
+  .meta-fig .card { max-width: 220px; }
+  .flow { flex-direction: column; }
+  .flow .arrow { width: auto; height: 22px; transform: rotate(90deg); }
+  .engine { grid-template-columns: 1fr; justify-items: stretch; }
+  .core { justify-self: center; }
+  .whisker-row, .waxis { grid-template-columns: 6.5em 1fr; }
+}
+</style>
+
+<article>
+  <a class="home" href="../../">← Asymmetry</a>
+
+  <header style="display:grid;gap:10px">
+    <h1>What if we had infinite intelligence over infinite <em>goods and services</em> data?</h1>
+    <p class="meta">Shaurya Jain · October 21, 2026</p>
+  </header>
+
+  <blockquote>
+    <p><strong>TL;DR:</strong> Agents have gotten good enough at almost everything, except buying things. They still shop like humans: screenshots, search results and checkout pages built for people. <strong>Smarter models don't fix that. Better data does.</strong> Give agents live, two-way access to every good and service, and they'll make better buying decisions than any human, in under a second. This unlocks a market where the best products win on merit, great merchants finally get found, decisions are quicker, and everyone gets to live and present themselves exactly the way they want.</p>
+  </blockquote>
+
+  <figure aria-label="The three parts of this post">
+    <nav class="parts">
+      <a class="part" href="#bad"><span class="label">Part 1 · the problem</span><h4>Agents are bad at buying things</h4>
+        <ul><li>Don't understand taste</li><li>10–40 minutes per purchase</li><li>Miss what decides a purchase</li><li>Get blocked at the door</li></ul></a>
+      <a class="part" href="#infra"><span class="label">Part 2 · why</span><h4>Agents shop on human infrastructure</h4>
+        <ul><li>Screenshots cost tokens</li><li>One click at a time</li><li>Only page one of results</li><li>Search can read, not buy</li></ul></a>
+      <a class="part moon" href="#whatif"><span class="label" style="color:var(--accent)">Part 3 · what if</span><h4>Agents shop like agents</h4>
+        <ul><li>Best product in under a second</li><li>Every listing, a million+</li><li>Understands your taste</li><li>The best decision possible</li></ul></a>
+    </nav>
+  </figure>
+
+  <h2 id="bad">Agents are bad at buying things</h2>
+  <p>I work at a startup which sells to companies building agents. I am incentivized to try <em>new AI things</em>. I am also incentivized to over-trust them, so I can catch them failing, so we can productize the fix.</p>
+  <p>I have been using all the personal agents since day 0, and I believe they have gotten good <em>enough</em> at most of the things they do. Commerce isn't one of them.</p>
+
+  <h3>Taste, or quality of decisions</h3>
+  <p>Instinct helped me find a doctor and booked an appointment for me. It ended up being neither good nor insured. Not all service appointments are going to be bad, but it still can't do better than me, in probably the same amount of active time I spent texting it.</p>
+  <p>I used Grok, Instinct and Muse to shop for new sheets for my room. None of them found something of my taste, or something of higher quality than the first Google link. When I tried to check out, it got blocked and handed it over to me.</p>
+  <p>We have run tons of examples, and <u>the current success rate and confidence aren't ready for the market.</u></p>
+
+  <figure>
+    <div class="errands">
+      <div class="errand">
+        <header><b>The doctor</b><span class="miss">2 misses</span></header>
+        <div class="row"><span class="k">Asked</span><span>Find me a doctor and book a visit</span></div>
+        <div class="row"><span class="k">Got</span><span>Booked, in one prompt</span></div>
+        <div class="row"><span class="k">But</span><span><span class="x">✕</span> Not covered by insurance<br><span class="x">✕</span> Not a good doctor</span></div>
+      </div>
+      <div class="errand">
+        <header><b>The sheets</b><span class="miss">2 misses</span></header>
+        <div class="row"><span class="k">Asked</span><span>New sheets for my room</span></div>
+        <div class="row"><span class="k">Got</span><span>The first Google link</span></div>
+        <div class="row"><span class="k">But</span><span><span class="x">✕</span> Not my taste, not better quality<br><span class="x">✕</span> Checkout blocked, handed back to me</span></div>
+      </div>
+    </div>
+    <figcaption><b>Two errands, two misses.</b> The agent finished both tasks. Neither result was one I would have picked myself.</figcaption>
+  </figure>
+
+  <p>Beyond satisfaction, there are a few other things that kill the experience for me.</p>
+
+  <h3>Speed</h3>
+  <p>It takes up to tens of minutes to surface the first result. With the follow-up conversation, buying a single thing can take 10–40+ minutes. That's more than the time an average <em>human</em> spends to buy simple things.</p>
+
+  <h3>It misses the important parts</h3>
+  <p>There's a lot of metadata on shopping websites that factors into the decision: delivery time, shipping cost, discounts, return policies, reviews, stock, seller trust, warranty, sizing and fit, and price history. Some perspective on these helps overall, and I would say beats the in-person experience.</p>
+
+  <figure>
+    <div class="panel meta-fig">
+      <div class="card" aria-label="A product listing">
+        <div class="img"></div>
+        <span class="t">Bedsheet set, queen</span>
+        <span class="s">photo · title · ★★★★☆</span>
+        <span class="label">What a screenshot shows</span>
+      </div>
+      <div style="display:grid;gap:10px">
+        <span class="label" style="color:var(--accent)">What decides the purchase</span>
+        <div class="chips">
+          <span class="chip">Delivery time</span><span class="chip">Shipping cost</span><span class="chip">Discounts</span><span class="chip">Return policy</span><span class="chip">Reviews</span><span class="chip">Stock</span><span class="chip">Seller trust</span><span class="chip">Warranty</span><span class="chip">Sizing and fit</span><span class="chip">Price history</span>
+        </div>
+      </div>
+    </div>
+    <figcaption><b>What decides a purchase lives around the product, not in its photo.</b> Most of it is spread across other pages, or not shown at all.</figcaption>
+  </figure>
+
+  <h3>Friction</h3>
+  <p>It's moderately stressful to onboard agents onto shopping infrastructure. Half of them are banned, and the other half are dicey in the best case. It's slightly easier to let them control the search, and outsource checkout to a human.</p>
+
+  <figure>
+    <div class="flow">
+      <div class="step hot"><b>Agent finds it</b><span>Search and pick go fine</span></div>
+      <div class="arrow">→</div>
+      <div class="step"><b>Goes to check out</b><span>Opens the store's checkout</span></div>
+      <div class="arrow">→</div>
+      <div class="step fail"><b>Blocked</b><span>Bot detection, captcha or login wall</span></div>
+      <div class="arrow">→</div>
+      <div class="step"><b>Handed to me</b><span>“Can you do the checkout?”</span></div>
+    </div>
+    <figcaption><b>Half the stores won't let the agent in.</b> The last step, paying, ends up back with a person.</figcaption>
+  </figure>
+
+  <p>Here's what we believe is the bottleneck.</p>
+
+  <h2 id="infra">Agents are shopping on human infrastructure</h2>
+
+  <h3>Computer use is just a proxy for a better solution</h3>
+  <p>A computer use agent <em>shops like a human.</em> It takes a screenshot, figures out what's on the page, decides where to click, clicks, waits for the page to load, and takes another screenshot. This sometimes happens tens or hundreds of times for each purchase.</p>
+
+  <figure>
+    <div class="panel">
+      <svg class="loop" viewBox="0 0 520 360" role="img" aria-label="The computer use loop: screenshot, read the page, decide, click, wait for load, repeated 10 to 100 or more times per purchase">
+        <defs><marker id="lh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0 0L10 5L0 10z"/></marker></defs>
+        <path class="edge" d="M318 52 L392 104" marker-end="url(#lh)"/>
+        <path class="edge" d="M430 152 L396 242" marker-end="url(#lh)"/>
+        <path class="edge" d="M314 282 L210 282" marker-end="url(#lh)"/>
+        <path class="edge" d="M124 242 L90 152" marker-end="url(#lh)"/>
+        <path class="edge" d="M128 104 L202 52" marker-end="url(#lh)"/>
+        <rect class="box" x="190" y="18" width="140" height="42" rx="4"/><text class="lbl" x="260" y="44" text-anchor="middle">Screenshot</text>
+        <text class="note" x="340" y="16" text-anchor="start">1,000–1,800 tokens</text>
+        <rect class="box" x="370" y="106" width="140" height="42" rx="4"/><text class="lbl" x="440" y="132" text-anchor="middle">Read page</text>
+        <rect class="box hot" x="320" y="260" width="140" height="42" rx="4"/><text class="lbl" x="390" y="286" text-anchor="middle">Decide</text>
+        <text class="note" x="390" y="324" text-anchor="middle">most of the time</text>
+        <rect class="box" x="60" y="260" width="140" height="42" rx="4"/><text class="lbl" x="130" y="286" text-anchor="middle">Click</text>
+        <rect class="box" x="10" y="106" width="140" height="42" rx="4"/><text class="lbl" x="80" y="132" text-anchor="middle">Wait for load</text>
+        <text class="big" x="260" y="176" text-anchor="middle">10–100+</text>
+        <text class="note" x="260" y="200" text-anchor="middle">loops per purchase</text>
+      </svg>
+    </div>
+    <figcaption><b>Every step is a full loop.</b> Each screenshot costs 1,000–1,800 tokens, plus about 4,500 tokens of tool overhead per request (<a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Anthropic, computer use docs</a>).</figcaption>
+  </figure>
+
+  <p><strong>It's one of the major things that make agents slow.</strong> Each round takes a few seconds, and the process is mostly sequential across hundreds of these <em>human actions</em>. That's why it takes minutes to surface the first result.</p>
+  <p><strong>It constrains agents.</strong> The agent only sees what fits on a screen: the same 10–20 listings a human would see, <strong><u>in the order the website wants to show them</u></strong>. Pop-ups, captchas and login walls stop it cold, and it only moves forward after getting past them.</p>
+  <p><strong>It's technically inefficient.</strong> Every screenshot costs <strong>1,000–1,800 tokens, on top of ~4,500 tokens of tool overhead on every single request</strong>, and the agent re-reads the whole page every time something changes. It's compute intensive in a way that just doesn't scale. And it cold starts every time: it doesn't remember it checked the same page yesterday, so it starts from zero.</p>
+  <p>This benchmark, <a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a>, put a clock on these agents. Stuff that takes a human a few minutes takes an agent tens of minutes. And it's not the clicking that's slow, it's the thinking in between: planning, second-guessing, checking its own work. It gets worse the longer it goes: later steps take up to 3× longer than the first ones. Across 16 agents, even the best took 2.7–4.3× more steps than a human would.</p>
+
+  <figure>
+    <div class="panel chart">
+      <span class="fig-title">Even the best agents take 2.7–4.3× the steps a human needs</span>
+      <div class="whisker-row"><span>A human</span>
+        <div class="wtrack"><div class="grid" style="left:0%"></div><div class="grid" style="left:20%"></div><div class="grid" style="left:40%"></div><div class="grid" style="left:60%"></div><div class="grid" style="left:80%"></div><div class="grid" style="left:100%"></div>
+          <div class="dot" style="left:20%"></div><span class="val" style="left:calc(20% + 12px)">1×</span></div></div>
+      <div class="whisker-row"><b>Best agents</b>
+        <div class="wtrack"><div class="grid" style="left:0%"></div><div class="grid" style="left:20%"></div><div class="grid" style="left:40%"></div><div class="grid" style="left:60%"></div><div class="grid" style="left:80%"></div><div class="grid" style="left:100%"></div>
+          <div class="range" style="left:54%;width:32%"></div><div class="dot hot" style="left:70%"></div><span class="val" style="right:calc(46% + 12px);color:var(--accent)">2.7–4.3×</span></div></div>
+      <div class="waxis"><span></span><div><span style="left:0%">0×</span><span style="left:20%">1×</span><span style="left:40%">2×</span><span style="left:60%">3×</span><span style="left:80%">4×</span><span style="left:100%">5×</span></div></div>
+    </div>
+    <figcaption><b>Steps to finish the same task, relative to a human's path.</b> Source: <a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a> (Abhyankar et al., MLSys 2026), 16 agents.</figcaption>
+  </figure>
+
+  <p>Shopping is worse. On <a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">DeepShop</a>, a benchmark of real shopping tasks, the agents Microsoft tested got it right 11.6–32% of the time. And that's before the websites that block them for being bots.</p>
+
+  <figure>
+    <div class="panel chart" id="deepshop">
+      <span class="fig-title">Today's best agents get shopping right less than a third of the time</span>
+    </div>
+    <figcaption><b>Task success on DeepShop, average of 3 runs.</b> Source: <a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">Microsoft Research, Fara-7B</a> (Nov 2025).</figcaption>
+  </figure>
+
+  <h3>Why web search APIs won't work</h3>
+  <p>The obvious fix is to skip the browser and hand agents search APIs like <a href="https://exa.ai">Exa</a>. It's faster, but it's built for reading the web, not buying from it.</p>
+
+  <figure>
+    <div class="panel">
+      <svg class="oneway" viewBox="0 0 620 210" role="img" aria-label="Search is a one-way street: the web flows to a search API and on to the agent, with no way back to buy, check out or ask the merchant">
+        <defs>
+          <marker id="oh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0 0L10 5L0 10z"/></marker>
+          <marker id="ob" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="bad" d="M0 0L10 5L0 10z"/></marker>
+        </defs>
+        <rect class="box" x="10" y="40" width="150" height="48" rx="4"/><text class="lbl" x="85" y="69" text-anchor="middle">The web</text>
+        <rect class="box" x="235" y="40" width="150" height="48" rx="4"/><text class="lbl" x="310" y="69" text-anchor="middle">Search API</text>
+        <rect class="box hot" x="460" y="40" width="150" height="48" rx="4"/><text class="lbl" x="535" y="69" text-anchor="middle">Agent</text>
+        <path class="edge" d="M162 64 H231" marker-end="url(#oh)"/>
+        <path class="edge" d="M387 64 H456" marker-end="url(#oh)"/>
+        <text class="note" x="196" y="30" text-anchor="middle">read</text>
+        <text class="note" x="421" y="30" text-anchor="middle">read</text>
+        <path class="back" d="M535 90 V150 H85 V94" marker-end="url(#ob)"/>
+        <circle class="xbg" cx="310" cy="150" r="13"/>
+        <path class="xm" d="M304 144 l12 12 M316 144 l-12 12"/>
+        <text class="note" x="310" y="190" text-anchor="middle">no way back: buy · check out · ask the merchant · take the blame</text>
+      </svg>
+    </div>
+    <figcaption><b>Search is a one-way street.</b> It reads the web. It can't act on it.</figcaption>
+  </figure>
+
+  <p><strong>Stale data.</strong> Prices, stock and delivery times change by the hour, and a search index <em>might</em> only catch up later. An agent quoting yesterday's price is worse than no agent at all.</p>
+  <p><strong>It's a one-way street.</strong> Search lets an agent read about a product, but action is limited to a hand-off to a browser, or back to a human.</p>
+  <p><strong>No clear signal of reliability.</strong> Search just relays the internet, but a purchase depends on it being right. If Amazon lists a wrong price, it's like blaming Google: no one takes the blame. So the agent double-checks everything itself, and that slows everyone down.</p>
+
+  <h2 id="whatif">What if we gave smart models better data?</h2>
+
+  <figure>
+    <div class="panel" style="overflow-x:auto">
+      <table class="vs">
+        <thead><tr><th></th><th>Today</th><th>What if</th></tr></thead>
+        <tbody>
+          <tr><td>Speed</td><td>10–40 minutes per product</td><td>Under a second</td></tr>
+          <tr><td>Reach</td><td>The same 10–20 listings on page one</td><td>Every listing, a million+</td></tr>
+          <tr><td>Taste</td><td>No better than the first Google link</td><td>Knows what I like</td></tr>
+          <tr><td>Decisions</td><td>In the order the website wants</td><td>Timing, real satisfaction data, returns handled</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figcaption><b>What changes when agents stop shopping like humans.</b> The left column uses the numbers in this post.</figcaption>
+  </figure>
+
+  <h3>Agents could find the best product in under a second</h3>
+  <p>This alone unlocks:</p>
+  <ul>
+    <li><strong>Higher conversion for merchants:</strong> the gap between wanting something and having it is where sales die. Fulfill the need instantly and more of them convert.</li>
+    <li><strong>Time saved for consumers:</strong> the 10–40 minutes agents and humans spend going back and forth on one product go back to us. Humans eventually save time, as it would become faster than current online commerce.</li>
+    <li><strong>More consumption:</strong> when acquiring a product or a service is effortless, you buy the things you'd otherwise keep putting off. (Maybe in a good way?)</li>
+  </ul>
+
+  <h3>Agents could see every listing (a million+) for a given offering</h3>
+  <p>Today an agent sees the same 10–20 listings I do. What if it saw all of them, and only the perfect listing got chosen?</p>
+  <ul>
+    <li><strong>Higher satisfaction for consumers:</strong> you get the one that's actually right, not the one that ranked first.</li>
+    <li><strong>Higher confidence in agents:</strong> once it picks right a few times, you stop double-checking it.</li>
+    <li><strong>A long tail of production:</strong> when niche needs finally surface, someone gets to build for them.</li>
+  </ul>
+
+  <h3>Agents could understand taste</h3>
+  <ul>
+    <li><strong>Happiness:</strong> users would be happier, and buying would feel joyful again: an experience, not a chore.</li>
+    <li><strong>Presentation:</strong> when finding the right thing takes a second instead of a Sunday, everyone gets to present themselves exactly the way they want. Society gets a lot more interesting when everyone expresses themselves better.</li>
+  </ul>
+
+  <h3>Agents could make the best decisions possible</h3>
+
+  <figure>
+    <div class="panel engine">
+      <div style="display:grid;gap:10px"><span class="label">Unlimited data</span>
+        <ul><li>Every listing, a million+</li><li>Every price change, live</li><li>Every review and return</li><li>Every delivery promise</li><li>What you already own</li><li>What you actually loved</li></ul></div>
+      <div style="display:grid;gap:8px;justify-items:center"><div class="core"><div><b>Agent</b><br><span>unlimited intelligence</span></div></div><span class="label" style="color:var(--accent)">under a second</span></div>
+      <div class="out" style="display:grid;gap:10px"><span class="label" style="color:var(--accent)">The best decision</span>
+        <ul><li>The right product, for you</li><li>Bought at the right moment</li><li>Returned before you notice</li><li>Insured if it's ever wrong</li></ul></div>
+    </div>
+    <figcaption><b>Unlimited intelligence over unlimited data.</b> The decisions an agent could own, from the points below.</figcaption>
+  </figure>
+
+  <ul>
+    <li><strong>Timing:</strong> data that tells them exactly how a price is moving and when to buy, programmatically.</li>
+    <li><strong>Real satisfaction signals:</strong> they'd know how happy people actually are with a product, with way more information than a review page.</li>
+    <li><strong>Returns on their own:</strong> an agent can return stuff for you, with even less human action.</li>
+    <li><strong>Safety nets:</strong> a cool-down window, insurance for bad purchases, and so on.</li>
+  </ul>
+
+  <p>Put it all together and you get to present yourself exactly the way you want, with the most optimal consumption possible.</p>
+</article>
+
+<script>
+// DeepShop bars, drawn from the rows on one 0-100% scale.
+(function () {
+  const rows = [
+    ["GLM-4.1V-9B-Thinking", 32.0],
+    ["Fara-7B", 26.2],
+    ["OpenAI computer-use-preview", 24.7],
+    ["SoM Agent (GPT-4o)", 16.0],
+    ["UI-TARS-1.5-7B", 11.6],
+  ];
+  const best = Math.max(...rows.map((r) => r[1]));
+  const host = document.getElementById("deepshop");
+  for (const [name, v] of rows) {
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    row.innerHTML = `<div class="name"><span>${name}</span><span class="v">${v.toFixed(1)}%</span></div>` +
+      `<div class="track"><div class="fill${v === best ? " best" : ""}" style="width:${v}%"></div></div>`;
+    host.appendChild(row);
+  }
+  const axis = document.createElement("div");
+  axis.className = "axis";
+  axis.innerHTML = "<span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>";
+  host.appendChild(axis);
+})();
+</script>

@@ -28,15 +28,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build
         run: |
-          mkdir -p _site
-          {
-            echo '<!doctype html><html lang="en"><head><meta charset="utf-8">'
-            echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
-            echo '<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>'
-            echo '</head><body>'
-            cat site/index.html
-            echo '</body></html>'
-          } > _site/index.html
+          cd site
+          find . -name '*.html' | while read -r f; do
+            mkdir -p "../_site/$(dirname "$f")"
+            {
+              echo '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+              echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
+              echo '<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>'
+              echo '</head><body>'
+              cat "$f"
+              echo '</body></html>'
+            } > "../_site/$f"
+          done
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
       - id: deployment
