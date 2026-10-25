@@ -18,18 +18,19 @@
   --accent-soft: #e4eaf4;
   --bad: #b0412e;
   --bad-soft: #f6e5e1;
+  --axis: #9a9ea3;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --fig: #1d1e20;
-    --link: #8fb0e6; --accent: #8fb0e6; --accent-soft: #233046; --bad: #e0806c; --bad-soft: #3a2420; color-scheme: dark;
+    --link: #8fb0e6; --accent: #8fb0e6; --accent-soft: #233046; --bad: #e0806c; --bad-soft: #3a2420; --axis: #6f7378; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --fig: #1d1e20;
-  --link: #8fb0e6; --accent: #8fb0e6; --accent-soft: #233046; --bad: #e0806c; --bad-soft: #3a2420; color-scheme: dark;
+  --link: #8fb0e6; --accent: #8fb0e6; --accent-soft: #233046; --bad: #e0806c; --bad-soft: #3a2420; --axis: #6f7378; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -66,118 +67,9 @@ figcaption b { color: var(--fg); font-weight: 600; }
 .panel { background: var(--fig); border-radius: 4px; padding: 18px; }
 svg text { font-family: var(--mono); }
 
-/* contents */
-.parts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; counter-reset: part; }
-.part { display: grid; gap: 8px; align-content: start; padding: 16px; border-top: 2px solid var(--fg); background: var(--fig); text-decoration: none; color: inherit; }
-.part:hover h4 { text-decoration: underline; text-underline-offset: 2px; }
-.part.moon { border-top-color: var(--accent); }
-.part h4 { margin: 0; font: 600 1rem/1.3 var(--serif); }
-.part ul { list-style: none; padding: 0; gap: 4px; font: 400 0.8rem/1.45 var(--mono); color: var(--muted); }
-
-/* errands */
-.errands { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.errand { display: grid; gap: 0; align-content: start; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
-.errand .row { display: grid; grid-template-columns: 5.5em 1fr; gap: 12px; padding: 10px 14px; border-top: 1px dashed var(--rule); font-size: 0.9rem; }
-.errand .row:first-of-type { border-top: 0; }
-.errand .k { font: 500 0.7rem/1.9 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
-.errand header { padding: 12px 14px; background: var(--fig); display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
-.errand header b { font-weight: 600; }
-.miss { color: var(--bad); font: 500 0.75rem/1.4 var(--mono); }
-.x { color: var(--bad); }
-
-/* metadata */
-.meta-fig { display: grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: center; }
-.card { border: 1px solid var(--fg); border-radius: 4px; padding: 12px; display: grid; gap: 8px; background: var(--bg); }
-.card .img { aspect-ratio: 4 / 3; max-width: 100%; background: repeating-linear-gradient(135deg, var(--fig) 0 8px, var(--rule) 8px 9px); border-radius: 2px; }
-.card .t { font-weight: 600; font-size: 0.92rem; }
-.card .s { font: 400 0.75rem/1.3 var(--mono); color: var(--muted); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { font: 400 0.8rem/1 var(--mono); padding: 7px 10px; border: 1px solid var(--accent); color: var(--fg); background: var(--accent-soft); border-radius: 2px; }
-
-/* flows */
-.flow { display: flex; align-items: stretch; gap: 0; }
-.flow .step { flex: 1 1 0; min-width: 0; border: 1px solid var(--rule); background: var(--bg); padding: 12px; display: grid; gap: 6px; align-content: start; border-radius: 4px; }
-.flow .step.hot { border-color: var(--accent); background: var(--accent-soft); }
-.flow .step.fail { border-color: var(--bad); background: var(--bad-soft); }
-.flow .step b { font-weight: 600; font-size: 0.95rem; }
-.flow .step span { font-size: 0.85rem; color: var(--muted); }
-.flow .arrow { flex: none; width: 28px; display: grid; place-items: center; color: var(--muted); font-family: var(--mono); }
-
-/* loop */
-.loop { width: 100%; max-width: 560px; height: auto; justify-self: center; display: block; margin: 0 auto; }
-.loop .box { fill: var(--bg); stroke: var(--muted); stroke-width: 1.25; }
-.loop .box.hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
-.loop .lbl { fill: var(--fg); font-size: 15px; }
-.loop .note { fill: var(--muted); font-size: 12.5px; }
-.loop .big { fill: var(--fg); font-size: 26px; font-weight: 500; }
-.loop .edge { stroke: var(--muted); stroke-width: 1.25; fill: none; }
-.loop .head { fill: var(--muted); }
-
-/* charts */
-.chart { display: grid; gap: 14px; }
-.bar-row { display: grid; gap: 5px; }
-.bar-row .name { display: flex; justify-content: space-between; gap: 12px; font-size: 0.88rem; }
-.bar-row .name .v { font: 500 0.82rem/1.6 var(--mono); font-variant-numeric: tabular-nums; }
-.track { position: relative; height: 12px; background: var(--rule); border-radius: 1px; }
-.fill { position: absolute; inset: 0 auto 0 0; background: var(--muted); border-radius: 1px; }
-.fill.best { background: var(--accent); }
-.axis { display: flex; justify-content: space-between; font: 400 0.72rem/1 var(--mono); color: var(--muted); padding-top: 2px; }
-.whisker-row { display: grid; grid-template-columns: 8.5em 1fr; gap: 14px; align-items: center; font-size: 0.88rem; }
-.wtrack { position: relative; height: 28px; }
-.wtrack .grid { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--rule); }
-.wtrack .range { position: absolute; top: 13px; height: 2px; background: var(--accent); }
-.wtrack .range::before, .wtrack .range::after { content: ""; position: absolute; top: -6px; width: 2px; height: 14px; background: var(--accent); }
-.wtrack .range::before { left: 0; } .wtrack .range::after { right: 0; }
-.wtrack .dot { position: absolute; top: 8px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--muted); }
-.wtrack .dot.hot { background: var(--accent); }
-.wtrack .val { position: absolute; top: 4px; font: 500 0.8rem/1.6 var(--mono); white-space: nowrap; }
-.waxis { display: grid; grid-template-columns: 8.5em 1fr; gap: 14px; }
-.waxis div { position: relative; height: 14px; font: 400 0.72rem/1 var(--mono); color: var(--muted); }
-.waxis span { position: absolute; transform: translateX(-50%); }
-
-/* one-way */
-.oneway { width: 100%; max-width: 620px; height: auto; display: block; margin: 0 auto; }
-.oneway .box { fill: var(--bg); stroke: var(--fg); stroke-width: 1.25; }
-.oneway .box.hot { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
-.oneway .lbl { fill: var(--fg); font-size: 15px; }
-.oneway .note { fill: var(--muted); font-size: 12.5px; }
-.oneway .edge { stroke: var(--muted); stroke-width: 1.5; fill: none; }
-.oneway .back { stroke: var(--bad); stroke-width: 1.5; fill: none; stroke-dasharray: 6 5; }
-.oneway .head { fill: var(--muted); }
-.oneway .bad { fill: var(--bad); }
-.oneway .xbg { fill: var(--bg); stroke: var(--bad); stroke-width: 1.5; }
-.oneway .xm { stroke: var(--bad); stroke-width: 2; stroke-linecap: round; }
-
-/* today vs what if */
-.vs { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-.vs th, .vs td { text-align: left; padding: 11px 12px 11px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
-.vs th { font: 500 0.7rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-.vs td:first-child { font: 500 0.82rem/1.6 var(--mono); color: var(--muted); width: 7em; }
-.vs td:nth-child(2) { color: var(--muted); }
-.vs td:nth-child(3) { font-weight: 600; }
-.vs th:nth-child(3) { color: var(--accent); }
-
-/* decision engine */
-.engine { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
-.engine > * { min-width: 0; }
-.engine ul { list-style: none; padding: 0; gap: 6px; }
-.engine li { font-size: 0.86rem; padding: 7px 10px; border: 1px solid var(--rule); border-radius: 2px; background: var(--bg); }
-.engine .out li { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
-.core { display: grid; place-items: center; text-align: center; gap: 4px; width: 132px; height: 132px; border-radius: 50%; border: 2px solid var(--accent); background: var(--accent-soft); padding: 12px; }
-.core b { font-size: 1rem; }
-.core span { font: 400 0.72rem/1.3 var(--mono); color: var(--muted); }
-.engine .arrow { font-family: var(--mono); color: var(--muted); text-align: center; }
-
-@media (max-width: 680px) {
-  .parts, .errands { grid-template-columns: 1fr; }
-  .meta-fig { grid-template-columns: 1fr; }
-  .meta-fig .card { max-width: 220px; }
-  .flow { flex-direction: column; }
-  .flow .arrow { width: auto; height: 22px; transform: rotate(90deg); }
-  .engine { grid-template-columns: 1fr; justify-items: stretch; }
-  .core { justify-self: center; }
-  .whisker-row, .waxis { grid-template-columns: 6.5em 1fr; }
-}
+/* original post graphics, recolored to the site's tokens */
+.toon { width: 100%; height: auto; display: block; }
+.toon text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 </style>
 
 <article>
@@ -188,19 +80,16 @@ svg text { font-family: var(--mono); }
     <p class="meta">Shaurya Jain · October 21, 2026</p>
   </header>
 
+  <figure>
+    <svg class="toon" viewBox="0 0 760 360" role="img" aria-label="Agents are bad at buying things" font-size="13"><rect x="8" y="8" width="744" height="344" rx="16" fill="var(--fig)"></rect><text x="40" y="62" font-size="12" font-weight="600" fill="var(--accent)" letter-spacing="1.5"></text><text x="40" y="120" font-size="44" font-weight="700" fill="var(--fg)">Agents are bad</text><text x="40" y="172" font-size="44" font-weight="700" fill="var(--fg)">at buying things</text><text x="40" y="214" font-size="15" fill="var(--muted)">Agents got good enough at most things.</text><text x="40" y="236" font-size="15" fill="var(--muted)">Commerce isn't one of them. Yet.</text><line x1="40" x2="120" y1="268" y2="268" stroke="var(--accent)" stroke-width="3"></line><text x="40" y="298" fill="var(--muted)">October 2026</text><line x1="490" x2="730" y1="300" y2="300" stroke="var(--rule)" stroke-width="2"></line><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><circle cx="540" cy="186" r="16"></circle><path d="M533 190q7 6 14 0"></path><line x1="540" y1="202" x2="540" y2="256"></line><line x1="540" y1="256" x2="528" y2="300"></line><line x1="540" y1="256" x2="552" y2="300"></line><line x1="540" y1="218" x2="518" y2="242"></line><line x1="540" y1="218" x2="562" y2="196"></line></g><circle cx="534" cy="182" r="2" fill="var(--fg)"></circle><circle cx="546" cy="182" r="2" fill="var(--fg)"></circle><rect x="500" y="240" width="30" height="32" rx="4" fill="var(--accent)" fill-opacity="0.15" stroke="var(--accent)" stroke-width="2"></rect><path d="M508 240q7 -12 14 0" fill="none" stroke="var(--accent)" stroke-width="2"></path><path d="M507 256l6 6l10 -12" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"></path><rect x="548" y="126" width="60" height="28" rx="14" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M556 154l-6 10l14 -10" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="578" y="144" text-anchor="middle" font-weight="600" fill="var(--fg)">Done.</text></g><g><g fill="none" stroke="var(--axis)" stroke-width="1.5"><rect x="618" y="84" width="70" height="46" rx="4" fill="var(--fig)"></rect><line x1="618" y1="94" x2="688" y2="94"></line><rect x="636" y="96" width="70" height="46" rx="4" fill="var(--fig)"></rect><line x1="636" y1="106" x2="706" y2="106"></line><rect x="654" y="108" width="70" height="46" rx="4" fill="var(--fig)"></rect><line x1="654" y1="118" x2="724" y2="118"></line></g><circle cx="689" cy="136" r="8" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="10 6"></circle><text x="671" y="74" text-anchor="middle" font-size="11.5" fill="var(--muted)">still loading...</text><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><line x1="680" y1="184" x2="680" y2="174"></line><rect x="656" y="184" width="48" height="36" rx="8"></rect><path d="M671 212q9 -5 18 0"></path><rect x="662" y="226" width="36" height="44" rx="6"></rect><line x1="672" y1="270" x2="672" y2="300"></line><line x1="688" y1="270" x2="688" y2="300"></line><line x1="662" y1="236" x2="646" y2="256"></line><line x1="698" y1="236" x2="714" y2="256"></line></g><circle cx="680" cy="170" r="4" fill="var(--accent)"></circle><circle cx="671" cy="199" r="3" fill="var(--fg)"></circle><circle cx="689" cy="199" r="3" fill="var(--fg)"></circle><path d="M714 186q5 7 0 11q-5 -4 0 -11z" fill="var(--accent)" fill-opacity="0.5"></path></g></svg>
+  </figure>
+
   <blockquote>
     <p><strong>TL;DR:</strong> Agents have gotten good enough at almost everything, except buying things. They still shop like humans: screenshots, search results and checkout pages built for people. <strong>Smarter models don't fix that. Better data does.</strong> Give agents live, two-way access to every good and service, and they'll make better buying decisions than any human, in under a second. This unlocks a market where the best products win on merit, great merchants finally get found, decisions are quicker, and everyone gets to live and present themselves exactly the way they want.</p>
   </blockquote>
 
-  <figure aria-label="The three parts of this post">
-    <nav class="parts">
-      <a class="part" href="#bad"><span class="label">Part 1 · the problem</span><h4>Agents are bad at buying things</h4>
-        <ul><li>Don't understand taste</li><li>10–40 minutes per purchase</li><li>Miss what decides a purchase</li><li>Get blocked at the door</li></ul></a>
-      <a class="part" href="#infra"><span class="label">Part 2 · why</span><h4>Agents shop on human infrastructure</h4>
-        <ul><li>Screenshots cost tokens</li><li>One click at a time</li><li>Only page one of results</li><li>Search can read, not buy</li></ul></a>
-      <a class="part moon" href="#whatif"><span class="label" style="color:var(--accent)">Part 3 · what if</span><h4>Agents shop like agents</h4>
-        <ul><li>Best product in under a second</li><li>Every listing, a million+</li><li>Understands your taste</li><li>The best decision possible</li></ul></a>
-    </nav>
+  <figure>
+    <svg class="toon" viewBox="0 0 760 304" role="img" aria-label="Three parts: the problem, why it happens, the moonshot" font-size="13"><text x="24" y="34" font-size="15" font-weight="600" fill="var(--fg)">Three parts: the problem, why it happens, the moonshot</text><line x1="166" x2="262" y1="80" y2="80" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="4 5"></line><line x1="436" x2="508" y1="80" y2="80" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="4 5"></line><g><path d="M253 188l7 7l-7 7" fill="none" stroke="var(--axis)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path><path d="M499 188l7 7l-7 7" fill="none" stroke="var(--axis)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path></g><g><circle cx="38" cy="80" r="12" fill="none" fill-opacity="1" stroke="var(--fg)" stroke-width="1.5"></circle><text x="38" y="84.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">1</text><text x="58" y="84" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--muted)">THE PROBLEM</text><rect x="24" y="104" width="220" height="182" rx="14" fill="var(--fig)" fill-opacity="1" stroke="none" stroke-width="2"></rect><g fill="none" stroke="var(--fg)" stroke-width="1.75" stroke-linecap="round"><rect x="194" y="124" width="32" height="24" rx="6"></rect><line x1="210" y1="124" x2="210" y2="118"></line><path d="M204 143q6 -5 12 0"></path></g><circle cx="210" cy="116" r="2.5" fill="var(--accent)"></circle><circle cx="205" cy="134" r="2" fill="var(--fg)"></circle><circle cx="215" cy="134" r="2" fill="var(--fg)"></circle><text x="42" y="140" font-size="15" font-weight="700" fill="var(--fg)">Agents are bad</text><text x="42" y="160" font-size="15" font-weight="700" fill="var(--fg)">at buying things</text><line x1="42" x2="50" y1="200" y2="200" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="42" x2="50" y1="222" y2="222" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="42" x2="50" y1="244" y2="244" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="42" x2="50" y1="266" y2="266" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><text x="58" y="204" font-size="12" fill="var(--fg)">Don't understand taste</text><text x="58" y="226" font-size="12" fill="var(--fg)">Too slow: 10-40 mins a buy</text><text x="58" y="248" font-size="12" fill="var(--fg)">Miss what decides a buy</text><text x="58" y="270" font-size="12" fill="var(--fg)">Get blocked at the door</text></g><g><circle cx="284" cy="80" r="12" fill="none" fill-opacity="1" stroke="var(--fg)" stroke-width="1.5"></circle><text x="284" y="84.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">2</text><text x="304" y="84" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--muted)">WHY IT HAPPENS</text><rect x="270" y="104" width="220" height="182" rx="14" fill="var(--fig)" fill-opacity="1" stroke="none" stroke-width="2"></rect><g fill="none" stroke="var(--fg)" stroke-width="1.75" stroke-linejoin="round"><rect x="440" y="120" width="34" height="26" rx="4"></rect><line x1="440" y1="127" x2="474" y2="127"></line></g><path d="M460 131v14l3.5 -3.5l3 6l2.5 -1.2l-3 -6h5z" fill="var(--fg)"></path><text x="288" y="140" font-size="15" font-weight="700" fill="var(--fg)">Agents shop on</text><text x="288" y="160" font-size="15" font-weight="700" fill="var(--fg)">human infrastructure</text><line x1="288" x2="296" y1="200" y2="200" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="288" x2="296" y1="222" y2="222" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="288" x2="296" y1="244" y2="244" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="288" x2="296" y1="266" y2="266" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><text x="304" y="204" font-size="12" fill="var(--fg)">Token-heavy screenshots</text><text x="304" y="226" font-size="12" fill="var(--fg)">Slow, one click at a time</text><text x="304" y="248" font-size="12" fill="var(--fg)">Pick from page one only</text><text x="304" y="270" font-size="12" fill="var(--fg)">Search can read, not buy</text></g><g><circle cx="530" cy="80" r="12" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="1.5"></circle><text x="530" y="84.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent)">3</text><text x="550" y="84" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--accent)">THE MOONSHOT</text><rect x="516" y="104" width="220" height="182" rx="14" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><path d="M704 116Q706 130 718 132Q706 134 704 148Q702 134 690 132Q702 130 704 116Z" fill="var(--accent)"></path><path d="M720 114l1.5 4.5l4.5 1.5l-4.5 1.5l-1.5 4.5l-1.5 -4.5l-4.5 -1.5l4.5 -1.5z" fill="var(--accent)" fill-opacity="0.6"></path><text x="534" y="140" font-size="15" font-weight="700" fill="var(--fg)">What if agents</text><text x="534" y="160" font-size="15" font-weight="700" fill="var(--fg)">shopped like agents</text><line x1="534" x2="542" y1="200" y2="200" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line><line x1="534" x2="542" y1="222" y2="222" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line><line x1="534" x2="542" y1="244" y2="244" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line><line x1="534" x2="542" y1="266" y2="266" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line><text x="550" y="204" font-size="12" fill="var(--fg)">Best product in under 1s</text><text x="550" y="226" font-size="12" fill="var(--fg)">Every listing, a million+</text><text x="550" y="248" font-size="12" fill="var(--fg)">Can explore your taste</text><text x="550" y="270" font-size="12" fill="var(--fg)">Best decisions possible</text></g></svg>
   </figure>
 
   <h2 id="bad">Agents are bad at buying things</h2>
@@ -213,21 +102,7 @@ svg text { font-family: var(--mono); }
   <p>We have run tons of examples, and <u>the current success rate and confidence aren't ready for the market.</u></p>
 
   <figure>
-    <div class="errands">
-      <div class="errand">
-        <header><b>The doctor</b><span class="miss">2 misses</span></header>
-        <div class="row"><span class="k">Asked</span><span>Find me a doctor and book a visit</span></div>
-        <div class="row"><span class="k">Got</span><span>Booked, in one prompt</span></div>
-        <div class="row"><span class="k">But</span><span><span class="x">✕</span> Not covered by insurance<br><span class="x">✕</span> Not a good doctor</span></div>
-      </div>
-      <div class="errand">
-        <header><b>The sheets</b><span class="miss">2 misses</span></header>
-        <div class="row"><span class="k">Asked</span><span>New sheets for my room</span></div>
-        <div class="row"><span class="k">Got</span><span>The first Google link</span></div>
-        <div class="row"><span class="k">But</span><span><span class="x">✕</span> Not my taste, not better quality<br><span class="x">✕</span> Checkout blocked, handed back to me</span></div>
-      </div>
-    </div>
-    <figcaption><b>Two errands, two misses.</b> The agent finished both tasks. Neither result was one I would have picked myself.</figcaption>
+    <svg class="toon" viewBox="0 0 760 300" role="img" aria-label="Two errands, two misses" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Two errands, two misses</text><g><rect x="24" y="46" width="348" height="238" rx="12" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="40" y="72" font-weight="600" fill="var(--fg)">The doctor</text><line x1="40" x2="356" y1="262" y2="262" stroke="var(--rule)" stroke-width="1.5"></line><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><rect x="86" y="146" width="48" height="36" rx="8"></rect><line x1="110" y1="146" x2="110" y2="136"></line><path d="M102 171q8 5 16 0"></path><rect x="92" y="188" width="36" height="42" rx="6"></rect><line x1="102" y1="230" x2="102" y2="262"></line><line x1="118" y1="230" x2="118" y2="262"></line><line x1="92" y1="198" x2="78" y2="216"></line><line x1="128" y1="198" x2="142" y2="212"></line></g><circle cx="110" cy="132" r="4" fill="var(--accent)"></circle><circle cx="101" cy="161" r="3" fill="var(--fg)"></circle><circle cx="119" cy="161" r="3" fill="var(--fg)"></circle></g><rect x="128" y="88" width="88" height="28" rx="14" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M138 116l-8 12l18 -12" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="172" y="106" text-anchor="middle" font-size="12" font-weight="600" fill="var(--fg)">Booked it!</text><rect x="214" y="104" width="140" height="142" rx="4" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><line x1="228" x2="340" y1="144" y2="144" stroke="var(--rule)"></line><text x="228" y="132" font-size="11.5" fill="var(--muted)">Doctor visit</text><text x="228" y="176" font-size="26" font-weight="700" fill="var(--fg)">$350</text><text x="228" y="204" font-size="12" font-weight="600" fill="var(--bad)">not covered</text><text x="228" y="224" font-size="11.5" fill="var(--muted)">and not that good</text></g><g><rect x="388" y="46" width="348" height="238" rx="12" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="404" y="72" font-weight="600" fill="var(--fg)">The sheets</text><line x1="404" x2="720" y1="262" y2="262" stroke="var(--rule)" stroke-width="1.5"></line><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><rect x="444" y="146" width="48" height="36" rx="8"></rect><line x1="468" y1="146" x2="468" y2="136"></line><path d="M460 171q8 5 16 0"></path><rect x="450" y="188" width="36" height="42" rx="6"></rect><line x1="460" y1="230" x2="460" y2="262"></line><line x1="476" y1="230" x2="476" y2="262"></line><line x1="450" y1="198" x2="436" y2="216"></line><line x1="486" y1="198" x2="500" y2="212"></line></g><circle cx="468" cy="132" r="4" fill="var(--accent)"></circle><circle cx="459" cy="161" r="3" fill="var(--fg)"></circle><circle cx="477" cy="161" r="3" fill="var(--fg)"></circle></g><rect x="496" y="206" width="46" height="10" rx="2" fill="var(--accent)" fill-opacity="0.25" stroke="var(--accent)" stroke-width="1.5"></rect><rect x="496" y="216" width="46" height="10" rx="2" fill="var(--accent)" fill-opacity="0.25" stroke="var(--accent)" stroke-width="1.5"></rect><rect x="404" y="88" width="128" height="28" rx="14" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M448 116l4 12l10 -12" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="468" y="106" text-anchor="middle" font-size="12" font-weight="600" fill="var(--fg)">Found your sheets!</text><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><circle cx="656" cy="154" r="16"></circle><line x1="656" y1="170" x2="656" y2="222"></line><line x1="656" y1="222" x2="644" y2="262"></line><line x1="656" y1="222" x2="668" y2="262"></line><line x1="656" y1="182" x2="636" y2="204"></line><line x1="656" y1="182" x2="676" y2="204"></line><path d="M650 162h12"></path></g><circle cx="650" cy="150" r="2" fill="var(--fg)"></circle><circle cx="662" cy="150" r="2" fill="var(--fg)"></circle></g><rect x="566" y="78" width="162" height="44" rx="22" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><circle cx="632" cy="128" r="3.5" fill="none" stroke="var(--axis)" stroke-width="1.25"></circle><text x="647" y="97" text-anchor="middle" font-size="11.5" fill="var(--muted)">...that's just the</text><text x="647" y="113" text-anchor="middle" font-size="11.5" fill="var(--muted)">first Google link</text></g></svg>
   </figure>
 
   <p>Beyond satisfaction, there are a few other things that kill the experience for me.</p>
@@ -239,37 +114,14 @@ svg text { font-family: var(--mono); }
   <p>There's a lot of metadata on shopping websites that factors into the decision: delivery time, shipping cost, discounts, return policies, reviews, stock, seller trust, warranty, sizing and fit, and price history. Some perspective on these helps overall, and I would say beats the in-person experience.</p>
 
   <figure>
-    <div class="panel meta-fig">
-      <div class="card" aria-label="A product listing">
-        <div class="img"></div>
-        <span class="t">Bedsheet set, queen</span>
-        <span class="s">photo · title · ★★★★☆</span>
-        <span class="label">What a screenshot shows</span>
-      </div>
-      <div style="display:grid;gap:10px">
-        <span class="label" style="color:var(--accent)">What decides the purchase</span>
-        <div class="chips">
-          <span class="chip">Delivery time</span><span class="chip">Shipping cost</span><span class="chip">Discounts</span><span class="chip">Return policy</span><span class="chip">Reviews</span><span class="chip">Stock</span><span class="chip">Seller trust</span><span class="chip">Warranty</span><span class="chip">Sizing and fit</span><span class="chip">Price history</span>
-        </div>
-      </div>
-    </div>
-    <figcaption><b>What decides a purchase lives around the product, not in its photo.</b> Most of it is spread across other pages, or not shown at all.</figcaption>
+    <svg class="toon" viewBox="0 0 760 328" role="img" aria-label="What decides a purchase lives around the product, not in the photo" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">What decides a purchase lives around the product, not in the photo</text><g stroke="var(--axis)" stroke-width="1.25" stroke-dasharray="3 3"><line x1="220" y1="105" x2="290" y2="105"></line><line x1="220" y1="197" x2="290" y2="197"></line><line x1="470" y1="105" x2="540" y2="105"></line><line x1="470" y1="197" x2="540" y2="197"></line><line x1="380" y1="260" x2="380" y2="278"></line></g><g><rect x="290" y="60" width="180" height="200" rx="10" fill="none" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="306" y="74" width="148" height="92" rx="6" fill="var(--fig)"></rect><g fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round"><rect x="326" y="120" width="108" height="28" rx="4"></rect><rect x="334" y="108" width="30" height="14" rx="4"></rect><line x1="330" y1="148" x2="330" y2="158"></line><line x1="430" y1="148" x2="430" y2="158"></line></g><text x="306" y="190" font-weight="600" fill="var(--fg)">Bedsheet set</text><text x="306" y="210" font-size="12" fill="var(--muted)">photo, title, stars</text><rect x="306" y="224" width="148" height="24" rx="12" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="1.5"></rect><text x="380" y="240" text-anchor="middle" font-size="11.5" fill="var(--fg)">Add to cart</text></g><g><rect x="40" y="88" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="none"></rect><text x="130" y="109" text-anchor="middle" fill="var(--fg)">Delivery time</text></g><g><rect x="40" y="180" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="none"></rect><text x="130" y="201" text-anchor="middle" fill="var(--fg)">Discounts</text></g><g><rect x="540" y="88" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="none"></rect><text x="630" y="109" text-anchor="middle" fill="var(--fg)">Return policy</text></g><g><rect x="540" y="180" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="none"></rect><text x="630" y="201" text-anchor="middle" fill="var(--fg)">Reviews</text></g><g><rect x="290" y="278" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5 4"></rect><text x="380" y="299" text-anchor="middle" fill="var(--muted)">+ more metadata</text></g></svg>
   </figure>
 
   <h3>Friction</h3>
   <p>It's moderately stressful to onboard agents onto shopping infrastructure. Half of them are banned, and the other half are dicey in the best case. It's slightly easier to let them control the search, and outsource checkout to a human.</p>
 
   <figure>
-    <div class="flow">
-      <div class="step hot"><b>Agent finds it</b><span>Search and pick go fine</span></div>
-      <div class="arrow">→</div>
-      <div class="step"><b>Goes to check out</b><span>Opens the store's checkout</span></div>
-      <div class="arrow">→</div>
-      <div class="step fail"><b>Blocked</b><span>Bot detection, captcha or login wall</span></div>
-      <div class="arrow">→</div>
-      <div class="step"><b>Handed to me</b><span>“Can you do the checkout?”</span></div>
-    </div>
-    <figcaption><b>Half the stores won't let the agent in.</b> The last step, paying, ends up back with a person.</figcaption>
+    <svg class="toon" viewBox="0 0 760 268" role="img" aria-label="Half the shops will not even let the agent in" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Half the shops won't even let it in</text><line x1="24" x2="736" y1="244" y2="244" stroke="var(--rule)" stroke-width="2"></line><g><text x="580" y="62" text-anchor="middle" font-weight="700" letter-spacing="2" fill="var(--fg)">STORE</text><rect x="440" y="70" width="40" height="24" fill="var(--accent)" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="480" y="70" width="40" height="24" fill="none" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="520" y="70" width="40" height="24" fill="var(--accent)" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="560" y="70" width="40" height="24" fill="none" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="600" y="70" width="40" height="24" fill="var(--accent)" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="640" y="70" width="40" height="24" fill="none" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="680" y="70" width="40" height="24" fill="var(--accent)" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="440" y="94" width="280" height="150" fill="none" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="460" y="118" width="100" height="70" rx="3" fill="none" stroke="var(--axis)" stroke-width="1.5"></rect><line x1="510" y1="118" x2="510" y2="188" stroke="var(--axis)" stroke-width="1.5"></line><rect x="600" y="140" width="80" height="104" fill="none" stroke="var(--fg)" stroke-width="1.5"></rect><circle cx="668" cy="196" r="3" fill="var(--fg)"></circle><rect x="608" y="158" width="64" height="26" rx="4" fill="var(--bad)" fill-opacity="0.12" stroke="var(--bad)" stroke-width="1.5"></rect><text x="640" y="176" text-anchor="middle" font-size="11" font-weight="700" fill="var(--bad)">NO BOTS</text></g><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><rect x="146" y="128" width="48" height="36" rx="8"></rect><line x1="170" y1="128" x2="170" y2="118"></line><path d="M162 156q8 -5 16 0"></path><rect x="152" y="170" width="36" height="42" rx="6"></rect><line x1="162" y1="212" x2="162" y2="244"></line><line x1="178" y1="212" x2="178" y2="244"></line><line x1="152" y1="180" x2="138" y2="198"></line><line x1="188" y1="180" x2="214" y2="192"></line><path d="M214 188h52l-8 26h-38z"></path><line x1="210" y1="184" x2="216" y2="194"></line></g><circle cx="226" cy="226" r="6" fill="none" stroke="var(--fg)" stroke-width="2"></circle><circle cx="254" cy="226" r="6" fill="none" stroke="var(--fg)" stroke-width="2"></circle><circle cx="170" cy="114" r="4" fill="var(--accent)"></circle><circle cx="161" cy="143" r="3" fill="var(--fg)"></circle><circle cx="179" cy="143" r="3" fill="var(--fg)"></circle><rect x="40" y="54" width="196" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M150 84l6 12l8 -12" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="138" y="73" text-anchor="middle" font-size="12" font-weight="600" fill="var(--fg)">Can you do the checkout?</text></g><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><circle cx="360" cy="136" r="16"></circle><line x1="360" y1="152" x2="360" y2="204"></line><line x1="360" y1="204" x2="348" y2="244"></line><line x1="360" y1="204" x2="374" y2="244"></line><line x1="360" y1="164" x2="340" y2="186"></line><line x1="360" y1="164" x2="382" y2="182"></line><path d="M354 144q6 -3 12 0"></path></g><circle cx="354" cy="132" r="2" fill="var(--fg)"></circle><circle cx="366" cy="132" r="2" fill="var(--fg)"></circle><rect x="300" y="70" width="120" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M352 100l4 12l8 -12" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="360" y="89" text-anchor="middle" font-size="12" fill="var(--muted)">Fine, I'll do it.</text></g></svg>
   </figure>
 
   <p>Here's what we believe is the bottleneck.</p>
@@ -280,26 +132,8 @@ svg text { font-family: var(--mono); }
   <p>A computer use agent <em>shops like a human.</em> It takes a screenshot, figures out what's on the page, decides where to click, clicks, waits for the page to load, and takes another screenshot. This sometimes happens tens or hundreds of times for each purchase.</p>
 
   <figure>
-    <div class="panel">
-      <svg class="loop" viewBox="0 0 520 360" role="img" aria-label="The computer use loop: screenshot, read the page, decide, click, wait for load, repeated 10 to 100 or more times per purchase">
-        <defs><marker id="lh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0 0L10 5L0 10z"/></marker></defs>
-        <path class="edge" d="M318 52 L392 104" marker-end="url(#lh)"/>
-        <path class="edge" d="M430 152 L396 242" marker-end="url(#lh)"/>
-        <path class="edge" d="M314 282 L210 282" marker-end="url(#lh)"/>
-        <path class="edge" d="M124 242 L90 152" marker-end="url(#lh)"/>
-        <path class="edge" d="M128 104 L202 52" marker-end="url(#lh)"/>
-        <rect class="box" x="190" y="18" width="140" height="42" rx="4"/><text class="lbl" x="260" y="44" text-anchor="middle">Screenshot</text>
-        <text class="note" x="340" y="16" text-anchor="start">1,000–1,800 tokens</text>
-        <rect class="box" x="370" y="106" width="140" height="42" rx="4"/><text class="lbl" x="440" y="132" text-anchor="middle">Read page</text>
-        <rect class="box hot" x="320" y="260" width="140" height="42" rx="4"/><text class="lbl" x="390" y="286" text-anchor="middle">Decide</text>
-        <text class="note" x="390" y="324" text-anchor="middle">most of the time</text>
-        <rect class="box" x="60" y="260" width="140" height="42" rx="4"/><text class="lbl" x="130" y="286" text-anchor="middle">Click</text>
-        <rect class="box" x="10" y="106" width="140" height="42" rx="4"/><text class="lbl" x="80" y="132" text-anchor="middle">Wait for load</text>
-        <text class="big" x="260" y="176" text-anchor="middle">10–100+</text>
-        <text class="note" x="260" y="200" text-anchor="middle">loops per purchase</text>
-      </svg>
-    </div>
-    <figcaption><b>Every step is a full loop.</b> Each screenshot costs 1,000–1,800 tokens, plus about 4,500 tokens of tool overhead per request (<a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Anthropic, computer use docs</a>).</figcaption>
+    <svg class="toon" viewBox="0 0 760 324" role="img" aria-label="Every step is a full loop, repeated dozens to hundreds of times per purchase" font-size="13"><defs><marker id="loop-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--axis)"></path></marker></defs><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Every step is a full loop, repeated dozens to hundreds of times per purchase</text><g fill="none" stroke="var(--axis)" stroke-width="1.25"><path d="M452 82L508 124" marker-end="url(#loop-arrow)"></path><path d="M572 162L534 238" marker-end="url(#loop-arrow)"></path><path d="M428 264H334" marker-end="url(#loop-arrow)"></path><path d="M226 240L188 164" marker-end="url(#loop-arrow)"></path><path d="M252 124L308 82" marker-end="url(#loop-arrow)"></path></g><g><rect x="310" y="52" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--axis)" stroke-width="1.25"></rect><text x="380" y="76" text-anchor="middle" fill="var(--fg)">Screenshot</text></g><text x="462" y="60" font-size="11.5" fill="var(--muted)">1,000-1,800 tokens each</text><g><rect x="510" y="122" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--axis)" stroke-width="1.25"></rect><text x="580" y="146" text-anchor="middle" fill="var(--fg)">Read the page</text></g><g><rect x="430" y="244" width="140" height="40" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="500" y="268" text-anchor="middle" font-weight="600" fill="var(--fg)">Decide</text><text x="500" y="304" text-anchor="middle" font-size="11.5" fill="var(--muted)">most of the time goes here</text></g><g><rect x="190" y="244" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="268" text-anchor="middle" fill="var(--fg)">Click</text></g><g><rect x="110" y="122" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--axis)" stroke-width="1.25"></rect><text x="180" y="146" text-anchor="middle" fill="var(--fg)">Wait for load</text></g><g><text x="380" y="172" text-anchor="middle" font-size="22" font-weight="700" fill="var(--fg)">10-100+ loops</text><text x="380" y="194" text-anchor="middle" font-size="11.5" fill="var(--muted)">per purchase</text></g></svg>
+    <figcaption>Token figures: <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Anthropic, computer use docs</a>. Plus about 4,500 tokens of tool overhead per request.</figcaption>
   </figure>
 
   <p><strong>It's one of the major things that make agents slow.</strong> Each round takes a few seconds, and the process is mostly sequential across hundreds of these <em>human actions</em>. That's why it takes minutes to surface the first result.</p>
@@ -308,52 +142,22 @@ svg text { font-family: var(--mono); }
   <p>This benchmark, <a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a>, put a clock on these agents. Stuff that takes a human a few minutes takes an agent tens of minutes. And it's not the clicking that's slow, it's the thinking in between: planning, second-guessing, checking its own work. It gets worse the longer it goes: later steps take up to 3× longer than the first ones. Across 16 agents, even the best took 2.7–4.3× more steps than a human would.</p>
 
   <figure>
-    <div class="panel chart">
-      <span class="fig-title">Even the best agents take 2.7–4.3× the steps a human needs</span>
-      <div class="whisker-row"><span>A human</span>
-        <div class="wtrack"><div class="grid" style="left:0%"></div><div class="grid" style="left:20%"></div><div class="grid" style="left:40%"></div><div class="grid" style="left:60%"></div><div class="grid" style="left:80%"></div><div class="grid" style="left:100%"></div>
-          <div class="dot" style="left:20%"></div><span class="val" style="left:calc(20% + 12px)">1×</span></div></div>
-      <div class="whisker-row"><b>Best agents</b>
-        <div class="wtrack"><div class="grid" style="left:0%"></div><div class="grid" style="left:20%"></div><div class="grid" style="left:40%"></div><div class="grid" style="left:60%"></div><div class="grid" style="left:80%"></div><div class="grid" style="left:100%"></div>
-          <div class="range" style="left:54%;width:32%"></div><div class="dot hot" style="left:70%"></div><span class="val" style="right:calc(46% + 12px);color:var(--accent)">2.7–4.3×</span></div></div>
-      <div class="waxis"><span></span><div><span style="left:0%">0×</span><span style="left:20%">1×</span><span style="left:40%">2×</span><span style="left:60%">3×</span><span style="left:80%">4×</span><span style="left:100%">5×</span></div></div>
-    </div>
-    <figcaption><b>Steps to finish the same task, relative to a human's path.</b> Source: <a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a> (Abhyankar et al., MLSys 2026), 16 agents.</figcaption>
+    <svg class="toon" viewBox="0 0 760 212" role="img" aria-label="Even the best agents take 2.7-4.3x the steps a human needs" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Even the best agents take 2.7-4.3x the steps a human needs</text><text x="24" y="52" font-size="11.5" fill="var(--muted)">Steps to finish the same OSWorld task, a human's path = 1x</text><g><g><line x1="260" x2="260" y1="76" y2="168" stroke="var(--rule)"></line><text x="260" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">0x</text></g><g><line x1="348" x2="348" y1="76" y2="168" stroke="var(--rule)"></line><text x="348" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">1x</text></g><g><line x1="436" x2="436" y1="76" y2="168" stroke="var(--rule)"></line><text x="436" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">2x</text></g><g><line x1="524" x2="524" y1="76" y2="168" stroke="var(--rule)"></line><text x="524" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">3x</text></g><g><line x1="612" x2="612" y1="76" y2="168" stroke="var(--rule)"></line><text x="612" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">4x</text></g><g><line x1="700" x2="700" y1="76" y2="168" stroke="var(--rule)"></line><text x="700" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">5x</text></g></g><g><text x="24" y="104" fill="var(--fg)" font-weight="400">A human</text><circle cx="348" cy="100" r="6" fill="var(--axis)"><title>A human: 1x</title></circle><text x="362" y="104" fill="var(--fg)" font-weight="400">1x</text></g><g><text x="24" y="148" fill="var(--fg)" font-weight="600">The best computer use agents</text><g><line x1="497.6" x2="638.4" y1="144" y2="144" stroke="var(--accent)" stroke-width="2"></line><line x1="497.6" x2="497.6" y1="137" y2="151" stroke="var(--accent)" stroke-width="2"></line><line x1="638.4" x2="638.4" y1="137" y2="151" stroke="var(--accent)" stroke-width="2"></line></g><circle cx="568" cy="144" r="6" fill="var(--accent)"><title>The best computer use agents: 2.7-4.3x the steps</title></circle><text x="652.4" y="148" fill="var(--fg)" font-weight="600">2.7-4.3x</text></g></svg>
+    <figcaption>Source: <a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a> (Abhyankar et al., MLSys 2026), 16 agents.</figcaption>
   </figure>
 
   <p>Shopping is worse. On <a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">DeepShop</a>, a benchmark of real shopping tasks, the agents Microsoft tested got it right 11.6–32% of the time. And that's before the websites that block them for being bots.</p>
 
   <figure>
-    <div class="panel chart" id="deepshop">
-      <span class="fig-title">Today's best agents get shopping right less than a third of the time</span>
-    </div>
-    <figcaption><b>Task success on DeepShop, average of 3 runs.</b> Source: <a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">Microsoft Research, Fara-7B</a> (Nov 2025).</figcaption>
+    <svg class="toon" viewBox="0 0 760 160" role="img" aria-label="Today's best models get shopping right less than a third of the time" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Today's best models get shopping right less than a third of the time</text><text x="24" y="52" font-size="11.5" fill="var(--muted)">Task success on DeepShop, a benchmark of real shopping tasks</text><text x="24" y="104" font-weight="600" fill="var(--fg)">Today's best models</text><g><rect x="200" y="86" width="520" height="28" rx="4" fill="var(--rule)" fill-opacity="0.5"></rect><rect x="200" y="86" width="166.39999999999998" height="28" rx="4" fill="var(--accent)"><title>At best: 32% of shopping tasks done right</title></rect><text x="366.4" y="78" text-anchor="end" font-weight="700" fill="var(--accent)">32% at best</text><text x="708" y="104" text-anchor="end" font-size="12" fill="var(--muted)">the other 68%: wrong product, or nothing bought</text><line x1="260.32" x2="260.32" y1="86" y2="120" stroke="var(--fg)" stroke-width="1.5"></line><text x="260.32" y="134" text-anchor="middle" font-size="11.5" fill="var(--muted)">worst: 11.6%</text><text x="200" y="134" text-anchor="middle" font-size="11.5" fill="var(--muted)">0%</text><text x="720" y="134" text-anchor="end" font-size="11.5" fill="var(--muted)">100%</text></g></svg>
+    <figcaption>Source: <a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">Microsoft Research, Fara-7B</a> (Nov 2025). DeepShop task success, average of 3 runs; worst agent tested: UI-TARS-1.5-7B.</figcaption>
   </figure>
 
   <h3>Why web search APIs won't work</h3>
   <p>The obvious fix is to skip the browser and hand agents search APIs like <a href="https://exa.ai">Exa</a>. It's faster, but it's built for reading the web, not buying from it.</p>
 
   <figure>
-    <div class="panel">
-      <svg class="oneway" viewBox="0 0 620 210" role="img" aria-label="Search is a one-way street: the web flows to a search API and on to the agent, with no way back to buy, check out or ask the merchant">
-        <defs>
-          <marker id="oh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0 0L10 5L0 10z"/></marker>
-          <marker id="ob" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="bad" d="M0 0L10 5L0 10z"/></marker>
-        </defs>
-        <rect class="box" x="10" y="40" width="150" height="48" rx="4"/><text class="lbl" x="85" y="69" text-anchor="middle">The web</text>
-        <rect class="box" x="235" y="40" width="150" height="48" rx="4"/><text class="lbl" x="310" y="69" text-anchor="middle">Search API</text>
-        <rect class="box hot" x="460" y="40" width="150" height="48" rx="4"/><text class="lbl" x="535" y="69" text-anchor="middle">Agent</text>
-        <path class="edge" d="M162 64 H231" marker-end="url(#oh)"/>
-        <path class="edge" d="M387 64 H456" marker-end="url(#oh)"/>
-        <text class="note" x="196" y="30" text-anchor="middle">read</text>
-        <text class="note" x="421" y="30" text-anchor="middle">read</text>
-        <path class="back" d="M535 90 V150 H85 V94" marker-end="url(#ob)"/>
-        <circle class="xbg" cx="310" cy="150" r="13"/>
-        <path class="xm" d="M304 144 l12 12 M316 144 l-12 12"/>
-        <text class="note" x="310" y="190" text-anchor="middle">no way back: buy · check out · ask the merchant · take the blame</text>
-      </svg>
-    </div>
-    <figcaption><b>Search is a one-way street.</b> It reads the web. It can't act on it.</figcaption>
+    <svg class="toon" viewBox="0 0 760 244" role="img" aria-label="Search is a one-way street: it reads the web, it cannot buy from it" font-size="13"><defs><marker id="ow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--axis)"></path></marker><marker id="ow-arrow-crit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--bad)"></path></marker></defs><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Search is a one-way street: it reads the web, it can't buy from it</text><rect x="24" y="100" width="712" height="60" rx="8" fill="var(--rule)" fill-opacity="0.5"></rect><g><line x1="380" y1="78" x2="380" y2="100" stroke="var(--fg)" stroke-width="2"></line><rect x="320" y="48" width="120" height="30" rx="4" fill="none" stroke="var(--fg)" stroke-width="2"></rect><text x="380" y="68" text-anchor="middle" font-weight="700" letter-spacing="1" fill="var(--fg)">ONE WAY &gt;</text></g><g fill="none" stroke="var(--axis)" stroke-width="1.5"><path d="M188 130H306" marker-end="url(#ow-arrow)"></path><path d="M450 130H568" marker-end="url(#ow-arrow)"></path></g><g><rect x="48" y="110" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--fg)" stroke-width="1.5"></rect><text x="118" y="134" text-anchor="middle" fill="var(--fg)">The web</text></g><g><rect x="310" y="110" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--fg)" stroke-width="1.5"></rect><text x="380" y="134" text-anchor="middle" fill="var(--fg)">Search API</text></g><g><rect x="572" y="110" width="140" height="40" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="642" y="134" text-anchor="middle" font-weight="600" fill="var(--fg)">Agent</text></g><g><path d="M642 150V196H118V154" fill="none" stroke="var(--bad)" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#ow-arrow-crit)"></path><circle cx="380" cy="196" r="11" fill="var(--fig)" stroke="var(--bad)" stroke-width="1.5"></circle><path d="M374 190l12 12M386 190l-12 12" stroke="var(--bad)" stroke-width="2" stroke-linecap="round"></path><text x="380" y="228" text-anchor="middle" font-size="11.5" fill="var(--muted)">no way back: buy, check out, ask the merchant, take the blame</text></g></svg>
   </figure>
 
   <p><strong>Stale data.</strong> Prices, stock and delivery times change by the hour, and a search index <em>might</em> only catch up later. An agent quoting yesterday's price is worse than no agent at all.</p>
@@ -363,18 +167,7 @@ svg text { font-family: var(--mono); }
   <h2 id="whatif">What if we gave smart models better data?</h2>
 
   <figure>
-    <div class="panel" style="overflow-x:auto">
-      <table class="vs">
-        <thead><tr><th></th><th>Today</th><th>What if</th></tr></thead>
-        <tbody>
-          <tr><td>Speed</td><td>10–40 minutes per product</td><td>Under a second</td></tr>
-          <tr><td>Reach</td><td>The same 10–20 listings on page one</td><td>Every listing, a million+</td></tr>
-          <tr><td>Taste</td><td>No better than the first Google link</td><td>Knows what I like</td></tr>
-          <tr><td>Decisions</td><td>In the order the website wants</td><td>Timing, real satisfaction data, returns handled</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <figcaption><b>What changes when agents stop shopping like humans.</b> The left column uses the numbers in this post.</figcaption>
+    <svg class="toon" viewBox="0 0 760 352" role="img" aria-label="What changes when agents stop shopping like humans" font-size="13"><defs><marker id="wi-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--axis)"></path></marker></defs><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">What changes when agents stop shopping like humans</text><text x="260" y="72" text-anchor="middle" font-weight="600" fill="var(--muted)">Today</text><text x="595" y="72" text-anchor="middle" font-weight="600" fill="var(--fg)">What if</text><g><path d="M416 112H448" fill="none" stroke="var(--axis)" stroke-width="1.25" marker-end="url(#wi-arrow)"></path><path d="M416 176H448" fill="none" stroke="var(--axis)" stroke-width="1.25" marker-end="url(#wi-arrow)"></path><path d="M416 240H448" fill="none" stroke="var(--axis)" stroke-width="1.25" marker-end="url(#wi-arrow)"></path><path d="M416 304H448" fill="none" stroke="var(--axis)" stroke-width="1.25" marker-end="url(#wi-arrow)"></path></g><g><text x="24" y="116" font-weight="600" fill="var(--fg)">Speed</text><rect x="110" y="88" width="300" height="48" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="116" text-anchor="middle" fill="var(--muted)">10-40 mins per product</text><rect x="454" y="88" width="282" height="48" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="595" y="116" text-anchor="middle" font-weight="600" fill="var(--fg)">Under a second</text></g><g><text x="24" y="180" font-weight="600" fill="var(--fg)">Reach</text><rect x="110" y="152" width="300" height="48" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="180" text-anchor="middle" fill="var(--muted)">The same 10-20 on page one</text><rect x="454" y="152" width="282" height="48" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="595" y="180" text-anchor="middle" font-weight="600" fill="var(--fg)">Every listing, a million+</text></g><g><text x="24" y="244" font-weight="600" fill="var(--fg)">Taste</text><rect x="110" y="216" width="300" height="48" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="244" text-anchor="middle" fill="var(--muted)">No better than the first Google link</text><rect x="454" y="216" width="282" height="48" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="595" y="244" text-anchor="middle" font-weight="600" fill="var(--fg)">Knows what I like</text></g><g><text x="24" y="308" font-weight="600" fill="var(--fg)">Decisions</text><rect x="110" y="280" width="300" height="48" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="308" text-anchor="middle" fill="var(--muted)">In the order the website wants</text><rect x="454" y="280" width="282" height="48" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="595" y="300" text-anchor="middle" font-weight="600" fill="var(--fg)"><tspan x="595">Timing, real satisfaction data,</tspan><tspan x="595" dy="16">returns handled</tspan></text></g></svg>
   </figure>
 
   <h3>Agents could find the best product in under a second</h3>
@@ -402,14 +195,7 @@ svg text { font-family: var(--mono); }
   <h3>Agents could make the best decisions possible</h3>
 
   <figure>
-    <div class="panel engine">
-      <div style="display:grid;gap:10px"><span class="label">Unlimited data</span>
-        <ul><li>Every listing, a million+</li><li>Every price change, live</li><li>Every review and return</li><li>Every delivery promise</li><li>What you already own</li><li>What you actually loved</li></ul></div>
-      <div style="display:grid;gap:8px;justify-items:center"><div class="core"><div><b>Agent</b><br><span>unlimited intelligence</span></div></div><span class="label" style="color:var(--accent)">under a second</span></div>
-      <div class="out" style="display:grid;gap:10px"><span class="label" style="color:var(--accent)">The best decision</span>
-        <ul><li>The right product, for you</li><li>Bought at the right moment</li><li>Returned before you notice</li><li>Insured if it's ever wrong</li></ul></div>
-    </div>
-    <figcaption><b>Unlimited intelligence over unlimited data.</b> The decisions an agent could own, from the points below.</figcaption>
+    <svg class="toon" viewBox="0 0 760 330" role="img" aria-label="Unlimited intelligence over unlimited data: the best decision, every time" font-size="12.5"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Unlimited intelligence over unlimited data: the best decision, every time</text><text x="24" y="58" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--muted)">UNLIMITED DATA</text><text x="526" y="58" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--accent)">THE BEST DECISION</text><g><g><line x1="234" y1="82" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="67" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="124" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="109" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="166" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="151" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="208" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="193" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="250" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="235" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="292" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="277" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><text x="40" y="86" fill="var(--fg)">Every listing, a million+</text><text x="40" y="128" fill="var(--fg)">Every price change, live</text><text x="40" y="170" fill="var(--fg)">Every review and return</text><text x="40" y="212" fill="var(--fg)">Every delivery promise</text><text x="40" y="254" fill="var(--fg)">What you already own</text><text x="40" y="296" fill="var(--fg)">What you actually loved</text></g><g><g><line x1="440" y1="185" x2="526" y2="118" stroke="var(--accent)" stroke-width="1.5"></line><rect x="526" y="103" width="210" height="30" rx="15" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect></g><g><line x1="440" y1="185" x2="526" y2="162" stroke="var(--accent)" stroke-width="1.5"></line><rect x="526" y="147" width="210" height="30" rx="15" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect></g><g><line x1="440" y1="185" x2="526" y2="206" stroke="var(--accent)" stroke-width="1.5"></line><rect x="526" y="191" width="210" height="30" rx="15" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect></g><g><line x1="440" y1="185" x2="526" y2="250" stroke="var(--accent)" stroke-width="1.5"></line><rect x="526" y="235" width="210" height="30" rx="15" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect></g><text x="542" y="122" font-weight="600" fill="var(--fg)">The right product, for you</text><text x="542" y="166" font-weight="600" fill="var(--fg)">Bought at the right moment</text><text x="542" y="210" font-weight="600" fill="var(--fg)">Returned before you notice</text><text x="542" y="254" font-weight="600" fill="var(--fg)">Insured if it's ever wrong</text></g><g><circle cx="380" cy="185" r="70" fill="var(--accent)" fill-opacity="0.06"></circle><circle cx="380" cy="185" r="60" fill="var(--accent)" fill-opacity="0.14" stroke="var(--accent)" stroke-width="2"></circle><text x="380" y="179" text-anchor="middle" font-size="16" font-weight="700" fill="var(--fg)">Agent</text><text x="380" y="197" text-anchor="middle" font-size="11.5" fill="var(--muted)">unlimited</text><text x="380" y="211" text-anchor="middle" font-size="11.5" fill="var(--muted)">intelligence</text><text x="380" y="279" text-anchor="middle" font-size="13" font-weight="700" fill="var(--accent)">in under a second</text></g></svg>
   </figure>
 
   <ul>
@@ -422,28 +208,3 @@ svg text { font-family: var(--mono); }
   <p>Put it all together and you get to present yourself exactly the way you want, with the most optimal consumption possible.</p>
 </article>
 
-<script>
-// DeepShop bars, drawn from the rows on one 0-100% scale.
-(function () {
-  const rows = [
-    ["GLM-4.1V-9B-Thinking", 32.0],
-    ["Fara-7B", 26.2],
-    ["OpenAI computer-use-preview", 24.7],
-    ["SoM Agent (GPT-4o)", 16.0],
-    ["UI-TARS-1.5-7B", 11.6],
-  ];
-  const best = Math.max(...rows.map((r) => r[1]));
-  const host = document.getElementById("deepshop");
-  for (const [name, v] of rows) {
-    const row = document.createElement("div");
-    row.className = "bar-row";
-    row.innerHTML = `<div class="name"><span>${name}</span><span class="v">${v.toFixed(1)}%</span></div>` +
-      `<div class="track"><div class="fill${v === best ? " best" : ""}" style="width:${v}%"></div></div>`;
-    host.appendChild(row);
-  }
-  const axis = document.createElement("div");
-  axis.className = "axis";
-  axis.innerHTML = "<span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>";
-  host.appendChild(axis);
-})();
-</script>
