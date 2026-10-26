@@ -1,0 +1,151 @@
+<title>Asymmetry</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Intelligence over goods and services">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a one-column research note. Serif text, mono for data, no ornament. */
+:root {
+  --bg: #fdfdfc;
+  --fg: #1c1d1f;
+  --muted: #6b6e73;
+  --rule: #e2e3e0;
+  --code-bg: #f4f4f2;
+  --link: #2a4f8f;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --code-bg: #1f2022; --link: #8fb0e6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --code-bg: #1f2022; --link: #8fb0e6; color-scheme: dark;
+}
+
+body {
+  background: var(--bg); color: var(--fg);
+  font: 400 18px/1.65 var(--serif);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+main { max-width: 640px; margin: 0 auto; padding-block: 64px 96px; display: grid; gap: 40px; }
+main > * { min-width: 0; }
+section { display: grid; gap: 14px; }
+h1 { font: 600 1.6rem/1.2 var(--serif); margin: 0; }
+h2 { font: 600 1.05rem/1.3 var(--serif); margin: 0; }
+p, ol, ul { margin: 0; }
+ol, ul { padding-left: 1.3em; display: grid; gap: 6px; }
+a { color: var(--link); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.muted { color: var(--muted); }
+.meta { font: 400 0.8rem/1.5 var(--mono); color: var(--muted); }
+code, .mono { font-family: var(--mono); font-size: 0.85em; }
+
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font: 400 0.82rem/1.4 var(--mono); font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 8px 0 8px 18px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+th { font-weight: 500; color: var(--muted); }
+caption { caption-side: bottom; text-align: left; padding-top: 10px; font: 400 0.85rem/1.5 var(--serif); color: var(--muted); }
+
+pre { margin: 0; background: var(--code-bg); padding: 14px 16px; border-radius: 3px; overflow-x: auto; font: 400 0.78rem/1.6 var(--mono); }
+.example { display: grid; gap: 10px; }
+.example p { font-size: 0.95rem; }
+</style>
+
+<main>
+  <header style="display:grid;gap:10px">
+    <h1>Asymmetry</h1>
+    <p class="muted">Intelligence over goods and services</p>
+    <p class="meta">October 2026</p>
+  </header>
+
+  <section>
+    <p>Agents shop on infrastructure built for people.</p>
+    <p>They either drive a browser, one screenshot at a time, or read search results that were never meant to support a purchase. Both are slow, expensive and often wrong.</p>
+    <p><strong>Smarter models do not fix this. <u>Better data</u> does.</strong></p>
+    <p>We take a shopping request, turn it into a structured product search, check a short list of candidates against their product pages, and return one product. We then check out, and handle the rest of the consumer experience natively: returns, agent insurance and more.</p>
+  </section>
+
+  <section>
+    <h2>The problem</h2>
+    <p><em>Browser agents</em> take a screenshot, decide where to click, wait for the page, and repeat, often hundreds of times per purchase. Each screenshot costs 1,000–1,800 tokens (<a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Anthropic</a>). The agent sees only the 10–20 listings that fit on a screen, in the order the site chooses, and stops at pop-ups, captchas and login walls.</p>
+    <ul>
+      <li>Across 16 agents, the best took 2.7–4.3× more steps than a person (<a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a>).</li>
+      <li>On DeepShop, the agents Microsoft tested completed 11.6–32% of shopping tasks (<a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">Microsoft Research</a>).</li>
+      <li>On WebMall, models working from screenshots completed 0–2 of 8 purchases. With one small change, reading the page's structure instead of a screenshot, the same models reached 62.5% (<a href="https://wbsg-uni-mannheim.github.io/WebMall/">WebMall</a>).</li>
+    </ul>
+    <p><em>Search APIs</em> are faster but built for reading the web. Prices, stock and delivery times change by the hour, and an index lags behind. Search can describe a product but cannot buy it. And nobody stands behind the data, so the agent re-checks everything itself.</p>
+  </section>
+
+  <section>
+    <h2>Results</h2>
+    <p>We ran both systems on tasks from DeepShop, a benchmark of 150 Amazon shopping tasks with attribute, filter and sort requirements (Lyu et al., 2025). A task counts as completed only if every requirement is met.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>System</th><th>Completed</th><th>Tokens</th><th>Model cost</th><th>Latency</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Asymmetry</td><td>40%</td><td>6.2k</td><td>$0.038</td><td>35 s</td></tr>
+          <tr><td>Claude Opus 5.5 + web search</td><td>20%</td><td>98.9k</td><td>$0.433</td><td>51 s</td></tr>
+        </tbody>
+        <caption>Tokens, cost and latency are medians per task. Cost covers model calls only.</caption>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Method</h2>
+    <ol>
+      <li>Parse the request into a search term, numeric filters, a sort order and required attributes (one model call).</li>
+      <li>Search the merchant catalog and apply the numeric filters in code.</li>
+      <li>Shortlist two candidates from titles, prices and ratings (one model call).</li>
+      <li>Fetch both product pages, check each requirement, and return one product (one model call).</li>
+    </ol>
+    <p>The model only reads structured product data, never full web pages, which is where the token difference comes from.</p>
+  </section>
+
+  <section class="example">
+    <h2>Example</h2>
+    <p>Request: “Wireless earbuds with noise cancelling under $80, 4.3+ stars and at least 1,000 reviews, cheapest first.”</p>
+<pre>{
+  "product": "TOZO NC9 Hybrid Active Noise Cancelling Wireless Earbuds",
+  "asin": "B0DD41G2NZ",
+  "price": 27.99,
+  "rating": 4.3,
+  "ratings_total": 50428,
+  "notes": "Tied on price with Soundcore P30i; chosen for more reviews and deeper ANC (45 dB)"
+}</pre>
+    <p class="muted">7.1k tokens, 4 product lookups, 34 s.</p>
+  </section>
+
+  <section>
+    <h2>Checkout</h2>
+    <p>For each merchant we try the available routes in order and fall back on failure: UCP (Shopify and Google), ACP (OpenAI and Stripe), a universal checkout provider for any product URL, and a browser as a last resort. Spend limits are enforced outside the agent, and the merchant receives a single-use payment token capped at the order total.</p>
+  </section>
+
+  <section>
+    <h2>Where this goes</h2>
+    <p>With complete, current data over goods and services, an agent could:</p>
+    <ul>
+      <li>find the right product in under a second, instead of 10–40 minutes;</li>
+      <li>consider every listing for a need, not the first page of results;</li>
+      <li>match a person's taste, not only their filters;</li>
+      <li>know when to buy, from how a price is moving;</li>
+      <li>judge products by how satisfied buyers actually are, beyond star ratings;</li>
+      <li>handle returns, and buy with safety nets such as a cool-down window.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>API</h2>
+<pre>POST /v1/search      { "query": "..." }                          → one product
+POST /v1/checkouts   { "items": [{ "productId": "...", "quantity": 1 }] }
+POST /v1/checkouts/:id/complete</pre>
+    <p class="muted">Also available as an MCP server. Code: <a href="https://github.com/shauryajain21/things.ai">github.com/shauryajain21/things.ai</a></p>
+  </section>
+</main>

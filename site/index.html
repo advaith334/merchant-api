@@ -1,151 +1,206 @@
 <title>Asymmetry</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Intelligence over goods and services">
+<meta name="description" content="Agents are bad at buying things. Smarter models don't fix that. Better data does.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a one-column research note. Serif text, mono for data, no ornament. */
+/* Layout: the home page's research-note column. Figures step out to a wider measure,
+   drawn with one accent (findings) and one warning red (failures); everything else is ink and grey. */
 :root {
   --bg: #fdfdfc;
   --fg: #1c1d1f;
   --muted: #6b6e73;
   --rule: #e2e3e0;
-  --code-bg: #f4f4f2;
+  --fig: #f5f5f3;
   --link: #2a4f8f;
+  --accent: #2a4f8f;
+  --accent-soft: #e4eaf4;
+  --bad: #b0412e;
+  --bad-soft: #f6e5e1;
+  --axis: #9a9ea3;
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --code-bg: #1f2022; --link: #8fb0e6; color-scheme: dark;
+    --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --fig: #1d1e20;
+    --link: #8fb0e6; --accent: #8fb0e6; --accent-soft: #233046; --bad: #e0806c; --bad-soft: #3a2420; --axis: #6f7378; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --code-bg: #1f2022; --link: #8fb0e6; color-scheme: dark;
+  --bg: #161718; --fg: #e6e6e3; --muted: #9a9da1; --rule: #2c2e30; --fig: #1d1e20;
+  --link: #8fb0e6; --accent: #8fb0e6; --accent-soft: #233046; --bad: #e0806c; --bad-soft: #3a2420; --axis: #6f7378; color-scheme: dark;
 }
 
+* { box-sizing: border-box; }
 body {
   background: var(--bg); color: var(--fg);
   font: 400 18px/1.65 var(--serif);
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
-main { max-width: 640px; margin: 0 auto; padding-block: 64px 96px; display: grid; gap: 40px; }
-main > * { min-width: 0; }
-section { display: grid; gap: 14px; }
-h1 { font: 600 1.6rem/1.2 var(--serif); margin: 0; }
-h2 { font: 600 1.05rem/1.3 var(--serif); margin: 0; }
-p, ol, ul { margin: 0; }
-ol, ul { padding-left: 1.3em; display: grid; gap: 6px; }
+article { max-width: 760px; margin: 0 auto; padding-block: 48px 112px; display: grid; gap: 22px; }
+article > * { min-width: 0; width: 100%; max-width: 640px; justify-self: center; }
+article > figure { max-width: none; }
+h1 { font: 600 1.85rem/1.2 var(--serif); margin: 0; text-wrap: balance; }
+h2 { font: 600 1.35rem/1.25 var(--serif); margin: 36px 0 0; text-wrap: balance; }
+h3 { font: 600 1.05rem/1.3 var(--serif); margin: 14px 0 0; }
+p, ul, ol, blockquote { margin: 0; }
+ul, ol { padding-left: 1.3em; display: grid; gap: 8px; }
 a { color: var(--link); text-underline-offset: 2px; }
 :focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .muted { color: var(--muted); }
 .meta { font: 400 0.8rem/1.5 var(--mono); color: var(--muted); }
-code, .mono { font-family: var(--mono); font-size: 0.85em; }
+.home { font: 400 0.8rem/1.5 var(--mono); color: var(--muted); text-decoration: none; }
+.home:hover { color: var(--fg); }
+blockquote { border-left: 2px solid var(--fg); padding: 2px 0 2px 18px; }
+.mono { font-family: var(--mono); }
 
-.table-wrap { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font: 400 0.82rem/1.4 var(--mono); font-variant-numeric: tabular-nums; }
-th, td { text-align: right; padding: 8px 0 8px 18px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
-th:first-child, td:first-child { text-align: left; padding-left: 0; }
-th { font-weight: 500; color: var(--muted); }
-caption { caption-side: bottom; text-align: left; padding-top: 10px; font: 400 0.85rem/1.5 var(--serif); color: var(--muted); }
+/* figures */
+figure { margin: 14px 0; display: grid; gap: 12px; }
+figure > * { min-width: 0; }
+figcaption { font: 400 0.82rem/1.5 var(--serif); color: var(--muted); max-width: 640px; justify-self: center; width: 100%; }
+figcaption b { color: var(--fg); font-weight: 600; }
+.fig-title { font: 600 0.95rem/1.35 var(--serif); }
+.label { font: 500 0.7rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.panel { background: var(--fig); border-radius: 4px; padding: 18px; }
+svg text { font-family: var(--mono); }
 
-pre { margin: 0; background: var(--code-bg); padding: 14px 16px; border-radius: 3px; overflow-x: auto; font: 400 0.78rem/1.6 var(--mono); }
-.example { display: grid; gap: 10px; }
-.example p { font-size: 0.95rem; }
+/* original post graphics, recolored to the site's tokens */
+.toon { width: 100%; height: auto; display: block; }
+.toon text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 </style>
 
-<main>
+<article>
+  <p class="meta">Asymmetry</p>
+
   <header style="display:grid;gap:10px">
-    <h1>Asymmetry</h1>
-    <p class="muted">Intelligence over goods and services</p>
-    <p class="meta">October 2026</p>
+    <h1>What if we had infinite intelligence over infinite <em>goods and services</em> data?</h1>
+    <p class="meta">Shaurya Jain · October 21, 2026</p>
   </header>
 
-  <section>
-    <p>Agents shop on infrastructure built for people.</p>
-    <p>They either drive a browser, one screenshot at a time, or read search results that were never meant to support a purchase. Both are slow, expensive and often wrong.</p>
-    <p><strong>Smarter models do not fix this. <u>Better data</u> does.</strong></p>
-    <p>We take a shopping request, turn it into a structured product search, check a short list of candidates against their product pages, and return one product. We then check out, and handle the rest of the consumer experience natively: returns, agent insurance and more.</p>
-  </section>
+  <blockquote>
+    <p><strong>TL;DR:</strong> Agents have gotten good enough at almost everything, except buying things. They still shop like humans: screenshots, search results and checkout pages built for people. <strong>Smarter models don't fix that. Better data does.</strong> Give agents live, two-way access to every good and service, and they'll make better buying decisions than any human, in under a second. This unlocks a market where the best products win on merit, great merchants finally get found, decisions are quicker, and everyone gets to live and present themselves exactly the way they want.</p>
+  </blockquote>
 
-  <section>
-    <h2>The problem</h2>
-    <p><em>Browser agents</em> take a screenshot, decide where to click, wait for the page, and repeat, often hundreds of times per purchase. Each screenshot costs 1,000–1,800 tokens (<a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Anthropic</a>). The agent sees only the 10–20 listings that fit on a screen, in the order the site chooses, and stops at pop-ups, captchas and login walls.</p>
-    <ul>
-      <li>Across 16 agents, the best took 2.7–4.3× more steps than a person (<a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a>).</li>
-      <li>On DeepShop, the agents Microsoft tested completed 11.6–32% of shopping tasks (<a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">Microsoft Research</a>).</li>
-      <li>On WebMall, models working from screenshots completed 0–2 of 8 purchases. With one small change, reading the page's structure instead of a screenshot, the same models reached 62.5% (<a href="https://wbsg-uni-mannheim.github.io/WebMall/">WebMall</a>).</li>
-    </ul>
-    <p><em>Search APIs</em> are faster but built for reading the web. Prices, stock and delivery times change by the hour, and an index lags behind. Search can describe a product but cannot buy it. And nobody stands behind the data, so the agent re-checks everything itself.</p>
-  </section>
+  <figure>
+    <svg class="toon" viewBox="0 0 760 304" role="img" aria-label="Three parts: the problem, why it happens, the moonshot" font-size="13"><text x="24" y="34" font-size="15" font-weight="600" fill="var(--fg)">Three parts: the problem, why it happens, the moonshot</text><line x1="166" x2="262" y1="80" y2="80" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="4 5"></line><line x1="436" x2="508" y1="80" y2="80" stroke="var(--rule)" stroke-width="1.5" stroke-dasharray="4 5"></line><g><path d="M253 188l7 7l-7 7" fill="none" stroke="var(--axis)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path><path d="M499 188l7 7l-7 7" fill="none" stroke="var(--axis)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path></g><g><circle cx="38" cy="80" r="12" fill="none" fill-opacity="1" stroke="var(--fg)" stroke-width="1.5"></circle><text x="38" y="84.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">1</text><text x="58" y="84" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--muted)">THE PROBLEM</text><rect x="24" y="104" width="220" height="182" rx="14" fill="var(--fig)" fill-opacity="1" stroke="none" stroke-width="2"></rect><g fill="none" stroke="var(--fg)" stroke-width="1.75" stroke-linecap="round"><rect x="194" y="124" width="32" height="24" rx="6"></rect><line x1="210" y1="124" x2="210" y2="118"></line><path d="M204 143q6 -5 12 0"></path></g><circle cx="210" cy="116" r="2.5" fill="var(--accent)"></circle><circle cx="205" cy="134" r="2" fill="var(--fg)"></circle><circle cx="215" cy="134" r="2" fill="var(--fg)"></circle><text x="42" y="140" font-size="15" font-weight="700" fill="var(--fg)">Agents are bad</text><text x="42" y="160" font-size="15" font-weight="700" fill="var(--fg)">at buying things</text><line x1="42" x2="50" y1="200" y2="200" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="42" x2="50" y1="222" y2="222" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="42" x2="50" y1="244" y2="244" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="42" x2="50" y1="266" y2="266" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><text x="58" y="204" font-size="12" fill="var(--fg)">Don't understand taste</text><text x="58" y="226" font-size="12" fill="var(--fg)">Too slow: 10-40 mins a buy</text><text x="58" y="248" font-size="12" fill="var(--fg)">Miss what decides a buy</text><text x="58" y="270" font-size="12" fill="var(--fg)">Get blocked at the door</text></g><g><circle cx="284" cy="80" r="12" fill="none" fill-opacity="1" stroke="var(--fg)" stroke-width="1.5"></circle><text x="284" y="84.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">2</text><text x="304" y="84" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--muted)">WHY IT HAPPENS</text><rect x="270" y="104" width="220" height="182" rx="14" fill="var(--fig)" fill-opacity="1" stroke="none" stroke-width="2"></rect><g fill="none" stroke="var(--fg)" stroke-width="1.75" stroke-linejoin="round"><rect x="440" y="120" width="34" height="26" rx="4"></rect><line x1="440" y1="127" x2="474" y2="127"></line></g><path d="M460 131v14l3.5 -3.5l3 6l2.5 -1.2l-3 -6h5z" fill="var(--fg)"></path><text x="288" y="140" font-size="15" font-weight="700" fill="var(--fg)">Agents shop on</text><text x="288" y="160" font-size="15" font-weight="700" fill="var(--fg)">human infrastructure</text><line x1="288" x2="296" y1="200" y2="200" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="288" x2="296" y1="222" y2="222" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="288" x2="296" y1="244" y2="244" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><line x1="288" x2="296" y1="266" y2="266" stroke="var(--axis)" stroke-width="2" stroke-linecap="round"></line><text x="304" y="204" font-size="12" fill="var(--fg)">Token-heavy screenshots</text><text x="304" y="226" font-size="12" fill="var(--fg)">Slow, one click at a time</text><text x="304" y="248" font-size="12" fill="var(--fg)">Pick from page one only</text><text x="304" y="270" font-size="12" fill="var(--fg)">Search can read, not buy</text></g><g><circle cx="530" cy="80" r="12" fill="var(--accent)" fill-opacity="0.18" stroke="var(--accent)" stroke-width="1.5"></circle><text x="530" y="84.5" text-anchor="middle" font-size="12" font-weight="700" fill="var(--accent)">3</text><text x="550" y="84" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--accent)">THE MOONSHOT</text><rect x="516" y="104" width="220" height="182" rx="14" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><path d="M704 116Q706 130 718 132Q706 134 704 148Q702 134 690 132Q702 130 704 116Z" fill="var(--accent)"></path><path d="M720 114l1.5 4.5l4.5 1.5l-4.5 1.5l-1.5 4.5l-1.5 -4.5l-4.5 -1.5l4.5 -1.5z" fill="var(--accent)" fill-opacity="0.6"></path><text x="534" y="140" font-size="15" font-weight="700" fill="var(--fg)">What if agents</text><text x="534" y="160" font-size="15" font-weight="700" fill="var(--fg)">shopped like agents</text><line x1="534" x2="542" y1="200" y2="200" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line><line x1="534" x2="542" y1="222" y2="222" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line><line x1="534" x2="542" y1="244" y2="244" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line><line x1="534" x2="542" y1="266" y2="266" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></line><text x="550" y="204" font-size="12" fill="var(--fg)">Best product in under 1s</text><text x="550" y="226" font-size="12" fill="var(--fg)">Every listing, a million+</text><text x="550" y="248" font-size="12" fill="var(--fg)">Can explore your taste</text><text x="550" y="270" font-size="12" fill="var(--fg)">Best decisions possible</text></g></svg>
+  </figure>
 
-  <section>
-    <h2>Results</h2>
-    <p>We ran both systems on tasks from DeepShop, a benchmark of 150 Amazon shopping tasks with attribute, filter and sort requirements (Lyu et al., 2025). A task counts as completed only if every requirement is met.</p>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>System</th><th>Completed</th><th>Tokens</th><th>Model cost</th><th>Latency</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Asymmetry</td><td>40%</td><td>6.2k</td><td>$0.038</td><td>35 s</td></tr>
-          <tr><td>Claude Opus 5.5 + web search</td><td>20%</td><td>98.9k</td><td>$0.433</td><td>51 s</td></tr>
-        </tbody>
-        <caption>Tokens, cost and latency are medians per task. Cost covers model calls only.</caption>
-      </table>
-    </div>
-  </section>
+  <h2 id="bad">Agents are bad at buying things</h2>
+  <p>I work at a startup which sells to companies building agents. I am incentivized to try <em>new AI things</em>. I am also incentivized to over-trust them, so I can catch them failing, so we can productize the fix.</p>
+  <p>I have been using all the personal agents since day 0, and I believe they have gotten good <em>enough</em> at most of the things they do. Commerce isn't one of them.</p>
 
-  <section>
-    <h2>Method</h2>
-    <ol>
-      <li>Parse the request into a search term, numeric filters, a sort order and required attributes (one model call).</li>
-      <li>Search the merchant catalog and apply the numeric filters in code.</li>
-      <li>Shortlist two candidates from titles, prices and ratings (one model call).</li>
-      <li>Fetch both product pages, check each requirement, and return one product (one model call).</li>
-    </ol>
-    <p>The model only reads structured product data, never full web pages, which is where the token difference comes from.</p>
-  </section>
+  <h3>Taste, or quality of decisions</h3>
+  <p>Instinct helped me find a doctor and booked an appointment for me. It ended up being neither good nor insured. Not all service appointments are going to be bad, but it still can't do better than me, in probably the same amount of active time I spent texting it.</p>
+  <p>I used Grok, Instinct and Muse to shop for new sheets for my room. None of them found something of my taste, or something of higher quality than the first Google link. When I tried to check out, it got blocked and handed it over to me.</p>
+  <p>We have run tons of examples, and <u>the current success rate and confidence aren't ready for the market.</u></p>
 
-  <section class="example">
-    <h2>Example</h2>
-    <p>Request: “Wireless earbuds with noise cancelling under $80, 4.3+ stars and at least 1,000 reviews, cheapest first.”</p>
-<pre>{
-  "product": "TOZO NC9 Hybrid Active Noise Cancelling Wireless Earbuds",
-  "asin": "B0DD41G2NZ",
-  "price": 27.99,
-  "rating": 4.3,
-  "ratings_total": 50428,
-  "notes": "Tied on price with Soundcore P30i; chosen for more reviews and deeper ANC (45 dB)"
-}</pre>
-    <p class="muted">7.1k tokens, 4 product lookups, 34 s.</p>
-  </section>
+  <figure>
+    <svg class="toon" viewBox="0 0 760 300" role="img" aria-label="Two errands, two misses" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Two errands, two misses</text><g><rect x="24" y="46" width="348" height="238" rx="12" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="40" y="72" font-weight="600" fill="var(--fg)">The doctor</text><line x1="40" x2="356" y1="262" y2="262" stroke="var(--rule)" stroke-width="1.5"></line><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><rect x="86" y="146" width="48" height="36" rx="8"></rect><line x1="110" y1="146" x2="110" y2="136"></line><path d="M102 171q8 5 16 0"></path><rect x="92" y="188" width="36" height="42" rx="6"></rect><line x1="102" y1="230" x2="102" y2="262"></line><line x1="118" y1="230" x2="118" y2="262"></line><line x1="92" y1="198" x2="78" y2="216"></line><line x1="128" y1="198" x2="142" y2="212"></line></g><circle cx="110" cy="132" r="4" fill="var(--accent)"></circle><circle cx="101" cy="161" r="3" fill="var(--fg)"></circle><circle cx="119" cy="161" r="3" fill="var(--fg)"></circle></g><rect x="128" y="88" width="88" height="28" rx="14" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M138 116l-8 12l18 -12" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="172" y="106" text-anchor="middle" font-size="12" font-weight="600" fill="var(--fg)">Booked it!</text><rect x="214" y="104" width="140" height="142" rx="4" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><line x1="228" x2="340" y1="144" y2="144" stroke="var(--rule)"></line><text x="228" y="132" font-size="11.5" fill="var(--muted)">Doctor visit</text><text x="228" y="176" font-size="26" font-weight="700" fill="var(--fg)">$350</text><text x="228" y="204" font-size="12" font-weight="600" fill="var(--bad)">not covered</text><text x="228" y="224" font-size="11.5" fill="var(--muted)">and not that good</text></g><g><rect x="388" y="46" width="348" height="238" rx="12" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="404" y="72" font-weight="600" fill="var(--fg)">The sheets</text><line x1="404" x2="720" y1="262" y2="262" stroke="var(--rule)" stroke-width="1.5"></line><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><rect x="444" y="146" width="48" height="36" rx="8"></rect><line x1="468" y1="146" x2="468" y2="136"></line><path d="M460 171q8 5 16 0"></path><rect x="450" y="188" width="36" height="42" rx="6"></rect><line x1="460" y1="230" x2="460" y2="262"></line><line x1="476" y1="230" x2="476" y2="262"></line><line x1="450" y1="198" x2="436" y2="216"></line><line x1="486" y1="198" x2="500" y2="212"></line></g><circle cx="468" cy="132" r="4" fill="var(--accent)"></circle><circle cx="459" cy="161" r="3" fill="var(--fg)"></circle><circle cx="477" cy="161" r="3" fill="var(--fg)"></circle></g><rect x="496" y="206" width="46" height="10" rx="2" fill="var(--accent)" fill-opacity="0.25" stroke="var(--accent)" stroke-width="1.5"></rect><rect x="496" y="216" width="46" height="10" rx="2" fill="var(--accent)" fill-opacity="0.25" stroke="var(--accent)" stroke-width="1.5"></rect><rect x="404" y="88" width="128" height="28" rx="14" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M448 116l4 12l10 -12" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="468" y="106" text-anchor="middle" font-size="12" font-weight="600" fill="var(--fg)">Found your sheets!</text><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><circle cx="656" cy="154" r="16"></circle><line x1="656" y1="170" x2="656" y2="222"></line><line x1="656" y1="222" x2="644" y2="262"></line><line x1="656" y1="222" x2="668" y2="262"></line><line x1="656" y1="182" x2="636" y2="204"></line><line x1="656" y1="182" x2="676" y2="204"></line><path d="M650 162h12"></path></g><circle cx="650" cy="150" r="2" fill="var(--fg)"></circle><circle cx="662" cy="150" r="2" fill="var(--fg)"></circle></g><rect x="566" y="78" width="162" height="44" rx="22" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><circle cx="632" cy="128" r="3.5" fill="none" stroke="var(--axis)" stroke-width="1.25"></circle><text x="647" y="97" text-anchor="middle" font-size="11.5" fill="var(--muted)">...that's just the</text><text x="647" y="113" text-anchor="middle" font-size="11.5" fill="var(--muted)">first Google link</text></g></svg>
+  </figure>
 
-  <section>
-    <h2>Checkout</h2>
-    <p>For each merchant we try the available routes in order and fall back on failure: UCP (Shopify and Google), ACP (OpenAI and Stripe), a universal checkout provider for any product URL, and a browser as a last resort. Spend limits are enforced outside the agent, and the merchant receives a single-use payment token capped at the order total.</p>
-  </section>
+  <p>Beyond satisfaction, there are a few other things that kill the experience for me.</p>
 
-  <section>
-    <h2>Where this goes</h2>
-    <p>With complete, current data over goods and services, an agent could:</p>
-    <ul>
-      <li>find the right product in under a second, instead of 10–40 minutes;</li>
-      <li>consider every listing for a need, not the first page of results;</li>
-      <li>match a person's taste, not only their filters;</li>
-      <li>know when to buy, from how a price is moving;</li>
-      <li>judge products by how satisfied buyers actually are, beyond star ratings;</li>
-      <li>handle returns, and buy with safety nets such as a cool-down window.</li>
-    </ul>
-  </section>
+  <h3>Speed</h3>
+  <p>It takes up to tens of minutes to surface the first result. With the follow-up conversation, buying a single thing can take 10–40+ minutes. That's more than the time an average <em>human</em> spends to buy simple things.</p>
 
-  <section>
-    <h2>API</h2>
-<pre>POST /v1/search      { "query": "..." }                          → one product
-POST /v1/checkouts   { "items": [{ "productId": "...", "quantity": 1 }] }
-POST /v1/checkouts/:id/complete</pre>
-    <p class="muted">Also available as an MCP server. Code: <a href="https://github.com/shauryajain21/things.ai">github.com/shauryajain21/things.ai</a></p>
-  </section>
-</main>
+  <h3>It misses the important parts</h3>
+  <p>There's a lot of metadata on shopping websites that factors into the decision: delivery time, shipping cost, discounts, return policies, reviews, stock, seller trust, warranty, sizing and fit, and price history. Some perspective on these helps overall, and I would say beats the in-person experience.</p>
+
+  <figure>
+    <svg class="toon" viewBox="0 0 760 328" role="img" aria-label="What decides a purchase lives around the product, not in the photo" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">What decides a purchase lives around the product, not in the photo</text><g stroke="var(--axis)" stroke-width="1.25" stroke-dasharray="3 3"><line x1="220" y1="105" x2="290" y2="105"></line><line x1="220" y1="197" x2="290" y2="197"></line><line x1="470" y1="105" x2="540" y2="105"></line><line x1="470" y1="197" x2="540" y2="197"></line><line x1="380" y1="260" x2="380" y2="278"></line></g><g><rect x="290" y="60" width="180" height="200" rx="10" fill="none" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="306" y="74" width="148" height="92" rx="6" fill="var(--fig)"></rect><g fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-linecap="round"><rect x="326" y="120" width="108" height="28" rx="4"></rect><rect x="334" y="108" width="30" height="14" rx="4"></rect><line x1="330" y1="148" x2="330" y2="158"></line><line x1="430" y1="148" x2="430" y2="158"></line></g><text x="306" y="190" font-weight="600" fill="var(--fg)">Bedsheet set</text><text x="306" y="210" font-size="12" fill="var(--muted)">photo, title, stars</text><rect x="306" y="224" width="148" height="24" rx="12" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="1.5"></rect><text x="380" y="240" text-anchor="middle" font-size="11.5" fill="var(--fg)">Add to cart</text></g><g><rect x="40" y="88" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="none"></rect><text x="130" y="109" text-anchor="middle" fill="var(--fg)">Delivery time</text></g><g><rect x="40" y="180" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="none"></rect><text x="130" y="201" text-anchor="middle" fill="var(--fg)">Discounts</text></g><g><rect x="540" y="88" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="none"></rect><text x="630" y="109" text-anchor="middle" fill="var(--fg)">Return policy</text></g><g><rect x="540" y="180" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="none"></rect><text x="630" y="201" text-anchor="middle" fill="var(--fg)">Reviews</text></g><g><rect x="290" y="278" width="180" height="34" rx="17" fill="var(--accent)" fill-opacity="0.08" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5 4"></rect><text x="380" y="299" text-anchor="middle" fill="var(--muted)">+ more metadata</text></g></svg>
+  </figure>
+
+  <h3>Friction</h3>
+  <p>It's moderately stressful to onboard agents onto shopping infrastructure. Half of them are banned, and the other half are dicey in the best case. It's slightly easier to let them control the search, and outsource checkout to a human.</p>
+
+  <figure>
+    <svg class="toon" viewBox="0 0 760 268" role="img" aria-label="Half the shops will not even let the agent in" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Half the shops won't even let it in</text><line x1="24" x2="736" y1="244" y2="244" stroke="var(--rule)" stroke-width="2"></line><g><text x="580" y="62" text-anchor="middle" font-weight="700" letter-spacing="2" fill="var(--fg)">STORE</text><rect x="440" y="70" width="40" height="24" fill="var(--accent)" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="480" y="70" width="40" height="24" fill="none" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="520" y="70" width="40" height="24" fill="var(--accent)" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="560" y="70" width="40" height="24" fill="none" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="600" y="70" width="40" height="24" fill="var(--accent)" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="640" y="70" width="40" height="24" fill="none" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="680" y="70" width="40" height="24" fill="var(--accent)" fill-opacity="0.25" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="440" y="94" width="280" height="150" fill="none" stroke="var(--fg)" stroke-width="1.5"></rect><rect x="460" y="118" width="100" height="70" rx="3" fill="none" stroke="var(--axis)" stroke-width="1.5"></rect><line x1="510" y1="118" x2="510" y2="188" stroke="var(--axis)" stroke-width="1.5"></line><rect x="600" y="140" width="80" height="104" fill="none" stroke="var(--fg)" stroke-width="1.5"></rect><circle cx="668" cy="196" r="3" fill="var(--fg)"></circle><rect x="608" y="158" width="64" height="26" rx="4" fill="var(--bad)" fill-opacity="0.12" stroke="var(--bad)" stroke-width="1.5"></rect><text x="640" y="176" text-anchor="middle" font-size="11" font-weight="700" fill="var(--bad)">NO BOTS</text></g><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><rect x="146" y="128" width="48" height="36" rx="8"></rect><line x1="170" y1="128" x2="170" y2="118"></line><path d="M162 156q8 -5 16 0"></path><rect x="152" y="170" width="36" height="42" rx="6"></rect><line x1="162" y1="212" x2="162" y2="244"></line><line x1="178" y1="212" x2="178" y2="244"></line><line x1="152" y1="180" x2="138" y2="198"></line><line x1="188" y1="180" x2="214" y2="192"></line><path d="M214 188h52l-8 26h-38z"></path><line x1="210" y1="184" x2="216" y2="194"></line></g><circle cx="226" cy="226" r="6" fill="none" stroke="var(--fg)" stroke-width="2"></circle><circle cx="254" cy="226" r="6" fill="none" stroke="var(--fg)" stroke-width="2"></circle><circle cx="170" cy="114" r="4" fill="var(--accent)"></circle><circle cx="161" cy="143" r="3" fill="var(--fg)"></circle><circle cx="179" cy="143" r="3" fill="var(--fg)"></circle><rect x="40" y="54" width="196" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M150 84l6 12l8 -12" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="138" y="73" text-anchor="middle" font-size="12" font-weight="600" fill="var(--fg)">Can you do the checkout?</text></g><g><g fill="none" stroke="var(--fg)" stroke-width="2" stroke-linecap="round"><circle cx="360" cy="136" r="16"></circle><line x1="360" y1="152" x2="360" y2="204"></line><line x1="360" y1="204" x2="348" y2="244"></line><line x1="360" y1="204" x2="374" y2="244"></line><line x1="360" y1="164" x2="340" y2="186"></line><line x1="360" y1="164" x2="382" y2="182"></line><path d="M354 144q6 -3 12 0"></path></g><circle cx="354" cy="132" r="2" fill="var(--fg)"></circle><circle cx="366" cy="132" r="2" fill="var(--fg)"></circle><rect x="300" y="70" width="120" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><path d="M352 100l4 12l8 -12" fill="none" stroke="var(--axis)" stroke-width="1.25"></path><text x="360" y="89" text-anchor="middle" font-size="12" fill="var(--muted)">Fine, I'll do it.</text></g></svg>
+  </figure>
+
+  <p>Here's what we believe is the bottleneck.</p>
+
+  <h2 id="infra">Agents are shopping on human infrastructure</h2>
+
+  <h3>Computer use is just a proxy for a better solution</h3>
+  <p>A computer use agent <em>shops like a human.</em> It takes a screenshot, figures out what's on the page, decides where to click, clicks, waits for the page to load, and takes another screenshot. This sometimes happens tens or hundreds of times for each purchase.</p>
+
+  <figure>
+    <svg class="toon" viewBox="0 0 760 324" role="img" aria-label="Every step is a full loop, repeated dozens to hundreds of times per purchase" font-size="13"><defs><marker id="loop-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--axis)"></path></marker></defs><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Every step is a full loop, repeated dozens to hundreds of times per purchase</text><g fill="none" stroke="var(--axis)" stroke-width="1.25"><path d="M452 82L508 124" marker-end="url(#loop-arrow)"></path><path d="M572 162L534 238" marker-end="url(#loop-arrow)"></path><path d="M428 264H334" marker-end="url(#loop-arrow)"></path><path d="M226 240L188 164" marker-end="url(#loop-arrow)"></path><path d="M252 124L308 82" marker-end="url(#loop-arrow)"></path></g><g><rect x="310" y="52" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--axis)" stroke-width="1.25"></rect><text x="380" y="76" text-anchor="middle" fill="var(--fg)">Screenshot</text></g><text x="462" y="60" font-size="11.5" fill="var(--muted)">1,000-1,800 tokens each</text><g><rect x="510" y="122" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--axis)" stroke-width="1.25"></rect><text x="580" y="146" text-anchor="middle" fill="var(--fg)">Read the page</text></g><g><rect x="430" y="244" width="140" height="40" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="500" y="268" text-anchor="middle" font-weight="600" fill="var(--fg)">Decide</text><text x="500" y="304" text-anchor="middle" font-size="11.5" fill="var(--muted)">most of the time goes here</text></g><g><rect x="190" y="244" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="268" text-anchor="middle" fill="var(--fg)">Click</text></g><g><rect x="110" y="122" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--axis)" stroke-width="1.25"></rect><text x="180" y="146" text-anchor="middle" fill="var(--fg)">Wait for load</text></g><g><text x="380" y="172" text-anchor="middle" font-size="22" font-weight="700" fill="var(--fg)">10-100+ loops</text><text x="380" y="194" text-anchor="middle" font-size="11.5" fill="var(--muted)">per purchase</text></g></svg>
+    <figcaption>Token figures: <a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool">Anthropic, computer use docs</a>. Plus about 4,500 tokens of tool overhead per request.</figcaption>
+  </figure>
+
+  <p><strong>It's one of the major things that make agents slow.</strong> Each round takes a few seconds, and the process is mostly sequential across hundreds of these <em>human actions</em>. That's why it takes minutes to surface the first result.</p>
+  <p><strong>It constrains agents.</strong> The agent only sees what fits on a screen: the same 10–20 listings a human would see, <strong><u>in the order the website wants to show them</u></strong>. Pop-ups, captchas and login walls stop it cold, and it only moves forward after getting past them.</p>
+  <p><strong>It's technically inefficient.</strong> Every screenshot costs <strong>1,000–1,800 tokens, on top of ~4,500 tokens of tool overhead on every single request</strong>, and the agent re-reads the whole page every time something changes. It's compute intensive in a way that just doesn't scale. And it cold starts every time: it doesn't remember it checked the same page yesterday, so it starts from zero.</p>
+  <p>This benchmark, <a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a>, put a clock on these agents. Stuff that takes a human a few minutes takes an agent tens of minutes. And it's not the clicking that's slow, it's the thinking in between: planning, second-guessing, checking its own work. It gets worse the longer it goes: later steps take up to 3× longer than the first ones. Across 16 agents, even the best took 2.7–4.3× more steps than a human would.</p>
+
+  <figure>
+    <svg class="toon" viewBox="0 0 760 212" role="img" aria-label="Even the best agents take 2.7-4.3x the steps a human needs" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Even the best agents take 2.7-4.3x the steps a human needs</text><text x="24" y="52" font-size="11.5" fill="var(--muted)">Steps to finish the same OSWorld task, a human's path = 1x</text><g><g><line x1="260" x2="260" y1="76" y2="168" stroke="var(--rule)"></line><text x="260" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">0x</text></g><g><line x1="348" x2="348" y1="76" y2="168" stroke="var(--rule)"></line><text x="348" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">1x</text></g><g><line x1="436" x2="436" y1="76" y2="168" stroke="var(--rule)"></line><text x="436" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">2x</text></g><g><line x1="524" x2="524" y1="76" y2="168" stroke="var(--rule)"></line><text x="524" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">3x</text></g><g><line x1="612" x2="612" y1="76" y2="168" stroke="var(--rule)"></line><text x="612" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">4x</text></g><g><line x1="700" x2="700" y1="76" y2="168" stroke="var(--rule)"></line><text x="700" y="188" text-anchor="middle" font-size="11.5" fill="var(--muted)">5x</text></g></g><g><text x="24" y="104" fill="var(--fg)" font-weight="400">A human</text><circle cx="348" cy="100" r="6" fill="var(--axis)"><title>A human: 1x</title></circle><text x="362" y="104" fill="var(--fg)" font-weight="400">1x</text></g><g><text x="24" y="148" fill="var(--fg)" font-weight="600">The best computer use agents</text><g><line x1="497.6" x2="638.4" y1="144" y2="144" stroke="var(--accent)" stroke-width="2"></line><line x1="497.6" x2="497.6" y1="137" y2="151" stroke="var(--accent)" stroke-width="2"></line><line x1="638.4" x2="638.4" y1="137" y2="151" stroke="var(--accent)" stroke-width="2"></line></g><circle cx="568" cy="144" r="6" fill="var(--accent)"><title>The best computer use agents: 2.7-4.3x the steps</title></circle><text x="652.4" y="148" fill="var(--fg)" font-weight="600">2.7-4.3x</text></g></svg>
+    <figcaption>Source: <a href="https://arxiv.org/abs/2506.16042">OSWorld-Human</a> (Abhyankar et al., MLSys 2026), 16 agents.</figcaption>
+  </figure>
+
+  <p>Shopping is worse. On <a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">DeepShop</a>, a benchmark of real shopping tasks, the agents Microsoft tested got it right 11.6–32% of the time. And that's before the websites that block them for being bots.</p>
+
+  <figure>
+    <svg class="toon" viewBox="0 0 760 160" role="img" aria-label="Today's best models get shopping right less than a third of the time" font-size="13"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Today's best models get shopping right less than a third of the time</text><text x="24" y="52" font-size="11.5" fill="var(--muted)">Task success on DeepShop, a benchmark of real shopping tasks</text><text x="24" y="104" font-weight="600" fill="var(--fg)">Today's best models</text><g><rect x="200" y="86" width="520" height="28" rx="4" fill="var(--rule)" fill-opacity="0.5"></rect><rect x="200" y="86" width="166.39999999999998" height="28" rx="4" fill="var(--accent)"><title>At best: 32% of shopping tasks done right</title></rect><text x="366.4" y="78" text-anchor="end" font-weight="700" fill="var(--accent)">32% at best</text><text x="708" y="104" text-anchor="end" font-size="12" fill="var(--muted)">the other 68%: wrong product, or nothing bought</text><line x1="260.32" x2="260.32" y1="86" y2="120" stroke="var(--fg)" stroke-width="1.5"></line><text x="260.32" y="134" text-anchor="middle" font-size="11.5" fill="var(--muted)">worst: 11.6%</text><text x="200" y="134" text-anchor="middle" font-size="11.5" fill="var(--muted)">0%</text><text x="720" y="134" text-anchor="end" font-size="11.5" fill="var(--muted)">100%</text></g></svg>
+    <figcaption>Source: <a href="https://www.microsoft.com/en-us/research/blog/fara-7b-an-efficient-agentic-model-for-computer-use/">Microsoft Research, Fara-7B</a> (Nov 2025). DeepShop task success, average of 3 runs; worst agent tested: UI-TARS-1.5-7B.</figcaption>
+  </figure>
+
+  <h3>Why web search APIs won't work</h3>
+  <p>The obvious fix is to skip the browser and hand agents search APIs like <a href="https://exa.ai">Exa</a>. It's faster, but it's built for reading the web, not buying from it.</p>
+
+  <figure>
+    <svg class="toon" viewBox="0 0 760 244" role="img" aria-label="Search is a one-way street: it reads the web, it cannot buy from it" font-size="13"><defs><marker id="ow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--axis)"></path></marker><marker id="ow-arrow-crit" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--bad)"></path></marker></defs><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Search is a one-way street: it reads the web, it can't buy from it</text><rect x="24" y="100" width="712" height="60" rx="8" fill="var(--rule)" fill-opacity="0.5"></rect><g><line x1="380" y1="78" x2="380" y2="100" stroke="var(--fg)" stroke-width="2"></line><rect x="320" y="48" width="120" height="30" rx="4" fill="none" stroke="var(--fg)" stroke-width="2"></rect><text x="380" y="68" text-anchor="middle" font-weight="700" letter-spacing="1" fill="var(--fg)">ONE WAY &gt;</text></g><g fill="none" stroke="var(--axis)" stroke-width="1.5"><path d="M188 130H306" marker-end="url(#ow-arrow)"></path><path d="M450 130H568" marker-end="url(#ow-arrow)"></path></g><g><rect x="48" y="110" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--fg)" stroke-width="1.5"></rect><text x="118" y="134" text-anchor="middle" fill="var(--fg)">The web</text></g><g><rect x="310" y="110" width="140" height="40" rx="8" fill="none" fill-opacity="1" stroke="var(--fg)" stroke-width="1.5"></rect><text x="380" y="134" text-anchor="middle" fill="var(--fg)">Search API</text></g><g><rect x="572" y="110" width="140" height="40" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="642" y="134" text-anchor="middle" font-weight="600" fill="var(--fg)">Agent</text></g><g><path d="M642 150V196H118V154" fill="none" stroke="var(--bad)" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#ow-arrow-crit)"></path><circle cx="380" cy="196" r="11" fill="var(--fig)" stroke="var(--bad)" stroke-width="1.5"></circle><path d="M374 190l12 12M386 190l-12 12" stroke="var(--bad)" stroke-width="2" stroke-linecap="round"></path><text x="380" y="228" text-anchor="middle" font-size="11.5" fill="var(--muted)">no way back: buy, check out, ask the merchant, take the blame</text></g></svg>
+  </figure>
+
+  <p><strong>Stale data.</strong> Prices, stock and delivery times change by the hour, and a search index <em>might</em> only catch up later. An agent quoting yesterday's price is worse than no agent at all.</p>
+  <p><strong>It's a one-way street.</strong> Search lets an agent read about a product, but action is limited to a hand-off to a browser, or back to a human.</p>
+  <p><strong>No clear signal of reliability.</strong> Search just relays the internet, but a purchase depends on it being right. If Amazon lists a wrong price, it's like blaming Google: no one takes the blame. So the agent double-checks everything itself, and that slows everyone down.</p>
+
+  <h2 id="whatif">What if we gave smart models better data?</h2>
+
+  <figure>
+    <svg class="toon" viewBox="0 0 760 352" role="img" aria-label="What changes when agents stop shopping like humans" font-size="13"><defs><marker id="wi-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--axis)"></path></marker></defs><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">What changes when agents stop shopping like humans</text><text x="260" y="72" text-anchor="middle" font-weight="600" fill="var(--muted)">Today</text><text x="595" y="72" text-anchor="middle" font-weight="600" fill="var(--fg)">What if</text><g><path d="M416 112H448" fill="none" stroke="var(--axis)" stroke-width="1.25" marker-end="url(#wi-arrow)"></path><path d="M416 176H448" fill="none" stroke="var(--axis)" stroke-width="1.25" marker-end="url(#wi-arrow)"></path><path d="M416 240H448" fill="none" stroke="var(--axis)" stroke-width="1.25" marker-end="url(#wi-arrow)"></path><path d="M416 304H448" fill="none" stroke="var(--axis)" stroke-width="1.25" marker-end="url(#wi-arrow)"></path></g><g><text x="24" y="116" font-weight="600" fill="var(--fg)">Speed</text><rect x="110" y="88" width="300" height="48" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="116" text-anchor="middle" fill="var(--muted)">10-40 mins per product</text><rect x="454" y="88" width="282" height="48" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="595" y="116" text-anchor="middle" font-weight="600" fill="var(--fg)">Under a second</text></g><g><text x="24" y="180" font-weight="600" fill="var(--fg)">Reach</text><rect x="110" y="152" width="300" height="48" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="180" text-anchor="middle" fill="var(--muted)">The same 10-20 on page one</text><rect x="454" y="152" width="282" height="48" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="595" y="180" text-anchor="middle" font-weight="600" fill="var(--fg)">Every listing, a million+</text></g><g><text x="24" y="244" font-weight="600" fill="var(--fg)">Taste</text><rect x="110" y="216" width="300" height="48" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="244" text-anchor="middle" fill="var(--muted)">No better than the first Google link</text><rect x="454" y="216" width="282" height="48" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="595" y="244" text-anchor="middle" font-weight="600" fill="var(--fg)">Knows what I like</text></g><g><text x="24" y="308" font-weight="600" fill="var(--fg)">Decisions</text><rect x="110" y="280" width="300" height="48" rx="8" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect><text x="260" y="308" text-anchor="middle" fill="var(--muted)">In the order the website wants</text><rect x="454" y="280" width="282" height="48" rx="8" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect><text x="595" y="300" text-anchor="middle" font-weight="600" fill="var(--fg)"><tspan x="595">Timing, real satisfaction data,</tspan><tspan x="595" dy="16">returns handled</tspan></text></g></svg>
+  </figure>
+
+  <h3>Agents could find the best product in under a second</h3>
+  <p>This alone unlocks:</p>
+  <ul>
+    <li><strong>Higher conversion for merchants:</strong> the gap between wanting something and having it is where sales die. Fulfill the need instantly and more of them convert.</li>
+    <li><strong>Time saved for consumers:</strong> the 10–40 minutes agents and humans spend going back and forth on one product go back to us. Humans eventually save time, as it would become faster than current online commerce.</li>
+    <li><strong>More consumption:</strong> when acquiring a product or a service is effortless, you buy the things you'd otherwise keep putting off. (Maybe in a good way?)</li>
+  </ul>
+
+  <h3>Agents could see every listing (a million+) for a given offering</h3>
+  <p>Today an agent sees the same 10–20 listings I do. What if it saw all of them, and only the perfect listing got chosen?</p>
+  <ul>
+    <li><strong>Higher satisfaction for consumers:</strong> you get the one that's actually right, not the one that ranked first.</li>
+    <li><strong>Higher confidence in agents:</strong> once it picks right a few times, you stop double-checking it.</li>
+    <li><strong>A long tail of production:</strong> when niche needs finally surface, someone gets to build for them.</li>
+  </ul>
+
+  <h3>Agents could understand taste</h3>
+  <ul>
+    <li><strong>Happiness:</strong> users would be happier, and buying would feel joyful again: an experience, not a chore.</li>
+    <li><strong>Presentation:</strong> when finding the right thing takes a second instead of a Sunday, everyone gets to present themselves exactly the way they want. Society gets a lot more interesting when everyone expresses themselves better.</li>
+  </ul>
+
+  <h3>Agents could make the best decisions possible</h3>
+
+  <figure>
+    <svg class="toon" viewBox="0 0 760 330" role="img" aria-label="Unlimited intelligence over unlimited data: the best decision, every time" font-size="12.5"><text x="24" y="30" font-size="15" font-weight="600" fill="var(--fg)">Unlimited intelligence over unlimited data: the best decision, every time</text><text x="24" y="58" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--muted)">UNLIMITED DATA</text><text x="526" y="58" font-size="11.5" font-weight="700" letter-spacing="1.2" fill="var(--accent)">THE BEST DECISION</text><g><g><line x1="234" y1="82" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="67" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="124" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="109" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="166" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="151" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="208" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="193" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="250" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="235" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><g><line x1="234" y1="292" x2="320" y2="185" stroke="var(--axis)" stroke-width="1" stroke-opacity="0.7"></line><rect x="24" y="277" width="210" height="30" rx="15" fill="none" stroke="var(--axis)" stroke-width="1.25"></rect></g><text x="40" y="86" fill="var(--fg)">Every listing, a million+</text><text x="40" y="128" fill="var(--fg)">Every price change, live</text><text x="40" y="170" fill="var(--fg)">Every review and return</text><text x="40" y="212" fill="var(--fg)">Every delivery promise</text><text x="40" y="254" fill="var(--fg)">What you already own</text><text x="40" y="296" fill="var(--fg)">What you actually loved</text></g><g><g><line x1="440" y1="185" x2="526" y2="118" stroke="var(--accent)" stroke-width="1.5"></line><rect x="526" y="103" width="210" height="30" rx="15" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect></g><g><line x1="440" y1="185" x2="526" y2="162" stroke="var(--accent)" stroke-width="1.5"></line><rect x="526" y="147" width="210" height="30" rx="15" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect></g><g><line x1="440" y1="185" x2="526" y2="206" stroke="var(--accent)" stroke-width="1.5"></line><rect x="526" y="191" width="210" height="30" rx="15" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect></g><g><line x1="440" y1="185" x2="526" y2="250" stroke="var(--accent)" stroke-width="1.5"></line><rect x="526" y="235" width="210" height="30" rx="15" fill="var(--accent)" fill-opacity="0.12" stroke="var(--accent)" stroke-width="2"></rect></g><text x="542" y="122" font-weight="600" fill="var(--fg)">The right product, for you</text><text x="542" y="166" font-weight="600" fill="var(--fg)">Bought at the right moment</text><text x="542" y="210" font-weight="600" fill="var(--fg)">Returned before you notice</text><text x="542" y="254" font-weight="600" fill="var(--fg)">Insured if it's ever wrong</text></g><g><circle cx="380" cy="185" r="70" fill="var(--accent)" fill-opacity="0.06"></circle><circle cx="380" cy="185" r="60" fill="var(--accent)" fill-opacity="0.14" stroke="var(--accent)" stroke-width="2"></circle><text x="380" y="179" text-anchor="middle" font-size="16" font-weight="700" fill="var(--fg)">Agent</text><text x="380" y="197" text-anchor="middle" font-size="11.5" fill="var(--muted)">unlimited</text><text x="380" y="211" text-anchor="middle" font-size="11.5" fill="var(--muted)">intelligence</text><text x="380" y="279" text-anchor="middle" font-size="13" font-weight="700" fill="var(--accent)">in under a second</text></g></svg>
+  </figure>
+
+  <ul>
+    <li><strong>Timing:</strong> data that tells them exactly how a price is moving and when to buy, programmatically.</li>
+    <li><strong>Real satisfaction signals:</strong> they'd know how happy people actually are with a product, with way more information than a review page.</li>
+    <li><strong>Returns on their own:</strong> an agent can return stuff for you, with even less human action.</li>
+    <li><strong>Safety nets:</strong> a cool-down window, insurance for bad purchases, and so on.</li>
+  </ul>
+
+  <p>Put it all together and you get to present yourself exactly the way you want, with the most optimal consumption possible.</p>
+</article>
+
