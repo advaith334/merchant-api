@@ -20,8 +20,11 @@ const MAX_SEARCHES = 4;
 
 /** The record for the agent's pick; agents often echo a url without its tracking query string. */
 function findPage(pages: Record<string, unknown>, url: string) {
+  if (pages[url]) return pages[url];
+  // Without the query string, only a unique match identifies the product.
   const bare = (u: string) => u.split(/[?#]/)[0].replace(/\/$/, "");
-  return pages[url] ?? Object.entries(pages).find(([u]) => bare(u) === bare(url))?.[1];
+  const matches = Object.entries(pages).filter(([u]) => bare(u) === bare(url));
+  return matches.length === 1 ? matches[0][1] : undefined;
 }
 
 export function toolAgent(provider: Provider) {

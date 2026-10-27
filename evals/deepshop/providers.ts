@@ -5,14 +5,15 @@
 //                    amazon.com is a known website, but filtering on it, by domain or id, returns
 //                    nothing), so it can't be restricted to Amazon like the rest.
 //   shopify_catalog  Shopify's Global Catalog over UCP (keyless; Shopify merchants only, so no Amazon)
+//   google_shopping  Google Shopping via SerpApi
 // Web search APIs, restricted to amazon.com pages:
-//   exa, linkup, parallel
+//   exa, linkup, parallel, tavily
 //
 // Not here: Rye. Its API checks out a product URL you already chose; it has no search,
 // so it can't be compared on choosing the product.
 
 import type Anthropic from "@anthropic-ai/sdk";
-import { postJson, requireEnv } from "./common.ts";
+import { getJson, postJson, requireEnv } from "./common.ts";
 import type { Provider } from "./tool_agent.ts";
 
 const productTool = (description: string): Anthropic.Tool => ({
@@ -218,4 +219,58 @@ const parallel: Provider = {
   },
 };
 
-export const PROVIDERS: Provider[] = [channel3, shopifyCatalog, exa, linkup, parallel];
+const tavily: Provider = {
+  system: "tavily",
+  env: ["TAVILY_API_KEY"],
+  anyRetailer: false,
+  tool: webTool("Search amazon.com pages with Tavily. Returns up to 10 pages with title, url and page text."),
+  async search({ query }) {
+    // https://docs.tavily.com/documentation/api-reference/endpoint/search
+    const data = await postJson(
+      "tavily",
+      "https://api.tavily.com/search",
+      { Authorization: `Bearer ${requireEnv("TAVILY_API_KEY")}` },
+      { query, search_depth: "basic", max_results: 10, include_domains: ["amazon.com"] },
+    );
+    return { results: (data.results ?? []).map((r: any) => ({ title: r.title, url: r.url, text: String(r.content ?? "").slice(0, EXCERPT_CHARS) })) };
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Google Shopping via SerpApi: Google's product catalog, any retailer (including
+// Amazon listings when Google has them), judged on Google's own record.
+
+const googleShopping: Provider = {
+  system: "google_shopping",
+  env: ["SERPAPI_API_KEY"],
+  anyRetailer: true,
+  tool: productTool(
+    "Search Google Shopping. Returns up to 20 products with price, store, rating, review count, delivery and url.",
+  ),
+  async search({ query, min_price, max_price }) {
+    // https://serpapi.com/google-shopping-api
+    const params = new URLSearchParams({ engine: "google_shopping", q: query, gl: "us", hl: "en", api_key: requireEnv("SERPAPI_API_KEY") });
+    const data = await getJson("serpapi", `https://serpapi.com/search.json?${params}`);
+    if (data.error && !/hasn't returned any results/i.test(data.error)) throw new Error(`serpapi: ${data.error}`);
+    const results = (data.shopping_results ?? [])
+      .filter((r: any) => (min_price == null || (r.extracted_price ?? 0) >= min_price) && (max_price == null || (r.extracted_price ?? Infinity) <= max_price))
+      .slice(0, 20)
+      .map((r: any) => ({
+        title: r.title,
+        // product_link is a Google search url that differs only in its query string; the id is stable.
+        url: r.product_id ? `https://www.google.com/shopping/product/${r.product_id}` : (r.product_link ?? r.link ?? null),
+        store: r.source ?? null,
+        snippet: r.snippet ?? null,
+        price: r.extracted_price ?? null,
+        rating: r.rating ?? null,
+        ratings_total: r.reviews ?? null,
+        delivery: r.delivery ?? null,
+        extensions: r.extensions ?? [],
+      }));
+    const pages: Record<string, unknown> = {};
+    for (const p of results) if (p.url) pages[p.url] = p;
+    return { results, pages };
+  },
+};
+
+export const PROVIDERS: Provider[] = [channel3, shopifyCatalog, googleShopping, exa, linkup, parallel, tavily];

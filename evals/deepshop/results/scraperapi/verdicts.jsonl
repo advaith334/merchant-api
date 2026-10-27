@@ -1,0 +1,15 @@
+{"taskId":"Amazon--66","system":"ours","dims":{"attribute":false},"success":false,"judgeTokens":2948}
+{"taskId":"Amazon--31","system":"ours","dims":{"attribute":false,"filter":false},"success":false,"judgeTokens":6418}
+{"taskId":"Amazon--268","system":"ours","dims":{"attribute":true,"filter":true,"sort":false},"success":false,"judgeTokens":8936}
+{"taskId":"Amazon--296","system":"ours","dims":{"attribute":false,"filter":true},"success":false,"judgeTokens":4327}
+{"taskId":"Amazon--79","system":"ours","dims":{"attribute":true},"success":true,"judgeTokens":2965}
+{"taskId":"Amazon--355","system":"ours","dims":{"attribute":false,"filter":true},"success":false,"judgeTokens":4187}
+{"taskId":"Amazon--54","system":"ours","dims":{"attribute":true,"filter":false,"sort":true},"success":false,"judgeTokens":8266}
+{"taskId":"Amazon--306","system":"ours","dims":{"attribute":false,"filter":false,"sort":false},"success":false,"judgeTokens":7820}
+{"taskId":"Amazon--330","system":"ours","dims":{"attribute":true,"filter":true,"sort":false},"success":false,"judgeTokens":9825}
+{"taskId":"Amazon--92","system":"ours","dims":{"attribute":true,"filter":true,"sort":true},"success":true,"judgeTokens":8969}
+{"taskId":"Amazon--31","system":"exa","dims":{"attribute":true,"filter":true},"success":true,"judgeTokens":5010}
+{"taskId":"Amazon--31","system":"linkup","dims":{"attribute":true,"filter":false},"success":false,"judgeTokens":4996}
+{"taskId":"Amazon--31","system":"parallel","dims":{"attribute":false,"filter":false},"success":false,"judgeTokens":6372}
+{"taskId":"Amazon--31","system":"tavily","dims":{"attribute":true,"filter":true},"success":true,"judgeTokens":4658}
+{"taskId":"Amazon--31","system":"google_shopping","dims":{"attribute":true,"filter":true},"success":true,"judgeTokens":3887}
