@@ -27,6 +27,9 @@
 // first candidate in that order that meets the task's stated requirements rather than trading it for
 // details the task doesn't ask for; a task asking for two products gets the second one searched,
 // checked and reported too; and the answer covers only requirements the task states.
+//
+// ours_v8 is ours_v6 with fewer tokens: the final choice gets each structured field (bullets,
+// specifications, description) only when the full page doesn't already carry that section.
 
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
@@ -89,9 +92,22 @@ export const runOursV4 = oursJev("ours_v4", 4);
 export const runOursV5 = oursJev("ours_v5", 5);
 export const runOursV6 = oursJev("ours_v6", 6);
 export const runOursV7 = oursJev("ours_v7", 7);
+export const runOursV8 = oursJev("ours_v8", 8);
+
+/** ours_v8: a page without the structured fields its full-page text already covers. */
+function lean(page: any) {
+  const fp: string = page.full_page ?? "";
+  const { feature_bullets, specifications, description, ...rest } = page;
+  return {
+    ...rest,
+    ...(fp.includes("[feature-bullets]") ? {} : { feature_bullets }),
+    ...(/\[(productDetails_|detailBullets_feature_div)/.test(fp) ? {} : { specifications }),
+    ...(fp.includes("[bookDescription_feature_div]") ? {} : { description }),
+  };
+}
 
 function oursJev(system: string, version: number) {
-  const v2 = version >= 2, v3 = version >= 3, v4 = version === 4, v5 = version >= 5, v6 = version >= 6, v7 = version >= 7;
+  const v2 = version >= 2, v3 = version >= 3, v4 = version === 4, v5 = version >= 5, v6 = version >= 6, v7 = version === 7, v8 = version === 8;
   return async function run(task: Task): Promise<Answer> {
     const t0 = Date.now();
     let input = 0, output = 0, calls = 0, jevTokens = 0;
@@ -252,7 +268,7 @@ function oursJev(system: string, version: number) {
         messages: [{
           role: "user",
           content: `Task: ${task.ques}\n\nCandidate product pages, best first by our checks:\n` +
-            ranked.map((p) => `${JSON.stringify(p.r)}\nAutomated checks: ${verifiedAnswer(p.r, p.checks, p.r.asin).replace(/^.*?ratings\.\s*/, "")}`).join("\n\n") +
+            ranked.map((p) => `${JSON.stringify(v8 ? lean(p.r) : p.r)}\nAutomated checks: ${verifiedAnswer(p.r, p.checks, p.r.asin).replace(/^.*?ratings\.\s*/, "")}`).join("\n\n") +
             (v7 ? (second ? `\n\nThe task's second product, best match from its own search:\n${JSON.stringify(second)}` : "") +
               `\n\nChoose the one product that best satisfies the task, using only the data above. ` +
               (plan.sort_by !== "featured"

@@ -51,8 +51,10 @@ function parseVerdict(text: string): boolean {
 export async function judge(task: Task, answer: Answer): Promise<Verdict> {
   // Amazon picks: the Amazon page, fetched independently. Non-Amazon picks (channel3,
   // shopify_catalog): the provider's own record of the product, as the agent saw it.
-  const product = answer.asin ? await getProduct(answer.asin).catch(() => null) : null;
-  const fullPage = product ? await amazonPageText(answer.asin!).catch(() => null) : null;
+  // A capped run can't fetch the page: leave the verdict pending rather than judge without it.
+  const capped = (err: unknown) => { if (/AMAZON_MAX_LIVE_CALLS/.test(String(err))) throw err; return null; };
+  const product = answer.asin ? await getProduct(answer.asin).catch(capped) : null;
+  const fullPage = product ? await amazonPageText(answer.asin!).catch(capped) : null;
   const page = answer.asin ? (product && fullPage ? { ...product, full_page: fullPage } : product) : (answer.page ?? null);
   const dims: Partial<Record<Dim, boolean>> = {};
   const reasons: Partial<Record<Dim, string>> = {};

@@ -15,7 +15,7 @@ import { createHash } from "node:crypto";
 import { parseArgs } from "node:util";
 import { AMAZON_DATA, apiLiveCalls, appendJsonl, loadTasks, amazonLiveCalls, readJsonl, type Answer, type Task } from "./common.ts";
 import { runOurs } from "./ours.ts";
-import { runOursJev, runOursV2, runOursV3, runOursV4, runOursV5, runOursV6, runOursV7 } from "./ours_jev.ts";
+import { runOursJev, runOursV2, runOursV3, runOursV4, runOursV5, runOursV6, runOursV7, runOursV8 } from "./ours_jev.ts";
 import { runBaseline } from "./baseline.ts";
 import { JUDGE_VERSION, judge, type Verdict } from "./judge.ts";
 import { PROVIDERS } from "./providers.ts";
@@ -49,11 +49,12 @@ const SYSTEMS: Record<string, (t: Task) => Promise<Answer>> = {
   ours_v5: runOursV5,
   ours_v6: runOursV6,
   ours_v7: runOursV7,
+  ours_v8: runOursV8,
   baseline: runBaseline,
   ...Object.fromEntries(PROVIDERS.map((p) => [p.system, toolAgent(p)])),
 };
 const REPORTED = [...Object.keys(SYSTEMS), "browser_use"];
-const ENV: Record<string, string[]> = { ours_jev: ["TYPESAFE_API_KEY"], ours_v2: ["TYPESAFE_API_KEY"], ours_v3: ["TYPESAFE_API_KEY"], ours_v4: ["TYPESAFE_API_KEY"], ours_v5: ["TYPESAFE_API_KEY"], ours_v6: ["TYPESAFE_API_KEY"], ours_v7: ["TYPESAFE_API_KEY"], ...Object.fromEntries(PROVIDERS.map((p) => [p.system, p.env])) };
+const ENV: Record<string, string[]> = { ours_jev: ["TYPESAFE_API_KEY"], ours_v2: ["TYPESAFE_API_KEY"], ours_v3: ["TYPESAFE_API_KEY"], ours_v4: ["TYPESAFE_API_KEY"], ours_v5: ["TYPESAFE_API_KEY"], ours_v6: ["TYPESAFE_API_KEY"], ours_v7: ["TYPESAFE_API_KEY"], ours_v8: ["TYPESAFE_API_KEY"], ...Object.fromEntries(PROVIDERS.map((p) => [p.system, p.env])) };
 const missingEnv = (system: string) => (ENV[system] ?? []).filter((e) => !process.env[e]);
 
 let tasks = loadTasks();
@@ -109,7 +110,13 @@ if (args["judge-pending"] || args.rejudge) {
       appendJsonl(ANSWERS, answer);
       console.log(`${system} ${task.id} ${answer.error ? "ERROR " + answer.error.slice(0, 120) : answer.asin ?? "no product"} ${(answer.latencyMs / 1000).toFixed(1)}s ${answer.inputTokens + answer.outputTokens} tok`);
       if (answer.error) return;
-      const v = await judge(task, answer);
+      let v: Verdict;
+      try {
+        v = await judge(task, answer);
+      } catch (err) {
+        console.log(`  judge pending: ${String(err).slice(0, 120)}`); // --judge-pending picks it up later
+        return;
+      }
       appendJsonl(VERDICTS, v);
       console.log(`  judge ${v.success ? "SUCCESS" : "NOT SUCCESS"} ${JSON.stringify(v.dims)}`);
     });
