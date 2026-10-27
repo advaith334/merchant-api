@@ -122,12 +122,14 @@ export async function runOursJev(task: Task): Promise<Answer> {
   const shortlist = pick(checked).slice(0, PAGES).map((c) => c.r.asin as string);
 
   // 4. Verify on product pages: Jev checks attributes, our code checks filters on the page's own numbers.
-  const pages = await Promise.all(shortlist.map(async (asin) => {
+  // One page at a time: ScraperAPI's free plan limits simultaneous requests.
+  const pages = [];
+  for (const asin of shortlist) {
     const page = await productWithVariants(asin);
     calls++;
     const { variants, ...product } = page;
-    return { r: page, ...(await check(product)) };
-  }));
+    pages.push({ r: page, ...(await check(product)) });
+  }
   const chosen = pick(pages.filter((p) => p.r?.asin))[0]?.r ?? null;
 
   // 5. The variant matching the option the task names.
