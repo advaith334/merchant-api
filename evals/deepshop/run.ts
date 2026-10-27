@@ -1,8 +1,9 @@
-// Usage: node --env-file=.env evals/deepshop/run.ts [--system all|<name>[,<name>...]] [--pilot | --test [--sample N] | --limit N] [--report | --judge-pending]
+// Usage: node --env-file=.env evals/deepshop/run.ts [--system all|<name>[,<name>...]] [--pilot | --test [--sample N [--offset M]] | --limit N] [--report | --judge-pending]
 // --pilot is the dev set (10 tasks we tuned on); --test is the other 140, for reporting;
-// --sample N keeps a fixed pseudo-random N of the selected tasks (ordered by a hash of the task id).
+// --sample N keeps a fixed pseudo-random N of the selected tasks (ordered by a hash of the task id);
+// --offset M skips the first M of that order, e.g. `--test --offset 70 --sample 20` for test tasks outside the published 70.
 // AMAZON_DATA=scraperapi switches the Amazon data source; its results go to results/scraperapi/.
-// Systems: ours, baseline, and one per provider in providers.ts. `all` runs every system whose API keys are set.
+// Systems: ours, ours_jev (needs TYPESAFE_API_KEY), baseline, and one per provider in providers.ts. `all` runs every system whose API keys are set.
 // --judge-pending judges answers written by other runners (browser_use/run.py) that have no verdict yet.
 // Results append to evals/deepshop/results/{answers,verdicts}.jsonl; finished tasks are skipped on re-run.
 
@@ -10,6 +11,7 @@ import { createHash } from "node:crypto";
 import { parseArgs } from "node:util";
 import { AMAZON_DATA, apiLiveCalls, appendJsonl, loadTasks, amazonLiveCalls, readJsonl, type Answer, type Task } from "./common.ts";
 import { runOurs } from "./ours.ts";
+import { runOursJev } from "./ours_jev.ts";
 import { runBaseline } from "./baseline.ts";
 import { judge, type Verdict } from "./judge.ts";
 import { PROVIDERS } from "./providers.ts";
@@ -21,6 +23,7 @@ const { values: args } = parseArgs({
     pilot: { type: "boolean", default: false },
     test: { type: "boolean", default: false },
     sample: { type: "string" },
+    offset: { type: "string", default: "0" },
     limit: { type: "string" },
     report: { type: "boolean", default: false },
     "judge-pending": { type: "boolean", default: false },
@@ -33,11 +36,13 @@ const ANSWERS = new URL(`${RESULTS}answers.jsonl`, import.meta.url);
 const VERDICTS = new URL(`${RESULTS}verdicts.jsonl`, import.meta.url);
 const SYSTEMS: Record<string, (t: Task) => Promise<Answer>> = {
   ours: runOurs,
+  ours_jev: runOursJev,
   baseline: runBaseline,
   ...Object.fromEntries(PROVIDERS.map((p) => [p.system, toolAgent(p)])),
 };
 const REPORTED = [...Object.keys(SYSTEMS), "browser_use"];
-const missingEnv = (system: string) => (PROVIDERS.find((p) => p.system === system)?.env ?? []).filter((e) => !process.env[e]);
+const ENV: Record<string, string[]> = { ours_jev: ["TYPESAFE_API_KEY"], ...Object.fromEntries(PROVIDERS.map((p) => [p.system, p.env])) };
+const missingEnv = (system: string) => (ENV[system] ?? []).filter((e) => !process.env[e]);
 
 let tasks = loadTasks();
 const isPilot = (_: Task, i: number) => i % 15 === 0; // 10 tasks spread over categories and difficulties
@@ -45,7 +50,7 @@ if (args.pilot) tasks = tasks.filter(isPilot);
 if (args.test) tasks = tasks.filter((t, i) => !isPilot(t, i));
 if (args.sample) {
   const h = (id: string) => createHash("sha256").update(id).digest("hex");
-  tasks = [...tasks].sort((a, b) => h(a.id).localeCompare(h(b.id))).slice(0, Number(args.sample));
+  tasks = [...tasks].sort((a, b) => h(a.id).localeCompare(h(b.id))).slice(Number(args.offset), Number(args.offset) + Number(args.sample));
 }
 if (args.limit) tasks = tasks.slice(0, Number(args.limit));
 let systems = args.system === "all" ? Object.keys(SYSTEMS) : args.system!.split(",");

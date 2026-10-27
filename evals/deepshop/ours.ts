@@ -7,9 +7,9 @@ import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { MODEL, amazon, client, trimProduct, trimSearchResult, usageOf, type Answer, type Task } from "./common.ts";
 
-const SORTS = ["featured", "bestseller_rankings", "price_low_to_high", "price_high_to_low", "average_review", "most_recent"] as const;
+export const SORTS = ["featured", "bestseller_rankings", "price_low_to_high", "price_high_to_low", "average_review", "most_recent"] as const;
 
-const Plan = z.object({
+export const Plan = z.object({
   search_term: z.string().describe("Amazon search box text: product type plus the 1-3 most discriminating attributes"),
   sort_by: z.enum(SORTS).describe("bestseller_rankings for best-selling or most popular; featured when no order is asked for"),
   min_price: z.number().nullable(),
@@ -32,7 +32,7 @@ const Final = z.object({
 });
 
 /** A product page plus its variants (size, color, ...), each with its own ASIN. */
-async function productWithVariants(asin: string) {
+export async function productWithVariants(asin: string) {
   const p = (await amazon({ type: "product", asin })).product;
   const variants = (p?.variants ?? []).slice(0, 80).map((v: any) => ({
     asin: v.asin,

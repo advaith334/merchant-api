@@ -27,6 +27,7 @@ export interface Answer {
   latencyMs: number;
   rainforestCalls: number;
   apiCalls?: number; // calls to the provider's search API (tool-agent systems)
+  jevTokens?: number; // tokens sent to Jev (ours_jev), not counted in inputTokens/outputTokens
   page?: unknown; // the provider's own record of a non-Amazon pick, which the judge grades instead of an Amazon page
   error?: string;
 }
