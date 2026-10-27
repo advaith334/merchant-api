@@ -45,7 +45,8 @@ The published sample is `--test --sample 70`. No system was tuned on it. Judge v
 
 | | Success | 95% CI | Attribute | Filter | Sort | Median tokens/task | Judge v1 |
 |---|---|---|---|---|---|---|---|
-| **Ours** (`ours.ts`) | **29%** | 19–40% | 61% | 53% | 28% | **~7k** | 19% |
+| **Ours, full-page (`ours_v6`)** | **33%** | 23–44% | 60% | 50% | 37% | ~11k† | |
+| Ours (`ours.ts`) | 29% | 19–40% | 61% | 53% | 28% | ~7k | 19% |
 | Parallel | 26% | 17–37% | 57% | 47% | 26% | ~32k | 20% |
 | Ours, low-token (`ours_v4`) | 24% | 16–35% | 49% | 42% | 35% | ~1.6k | 16% |
 | Baseline (Claude + web search) | 23% | 15–34% | 60% | 42% | 28% | ~91k | 23% |
@@ -57,14 +58,16 @@ The published sample is `--test --sample 70`. No system was tuned on it. Judge v
 | Channel3* | 9% | 4–17% | 44% | 18% | 26% | ~63k | |
 
 \*Judged on the provider's own record, so the full-page change doesn't apply; see [Adjacent products](#adjacent-products).
+†Claude tokens. `ours_v6` also sends a median ~35k tokens to Jev (TypeSafe's checking model, $0.042 per million input tokens, about $0.0015 a task).
 
 The intervals overlap, so lead with the paired comparison. Over the same 70 tasks, ours passes a task the other fails more often than the reverse, against every system:
 
-| Ours vs | Parallel | Baseline | Exa | Tavily | Linkup | `ours_v4` |
-|---|---|---|---|---|---|---|
-| Ours wins / loses | 8 / 6 | 9 / 5 | 10 / 6 | 9 / 4 | 11 / 3 | 8 / 5 |
+| Wins / losses vs | Parallel | Baseline | Exa | Tavily | Linkup | `ours` | `ours_v4` |
+|---|---|---|---|---|---|---|---|
+| `ours_v6` | 10 / 5 | 15 / 8 | 13 / 6 | 14 / 6 | 17 / 6 | 7 / 4 | 9 / 3 |
+| `ours` | 8 / 6 | 9 / 5 | 10 / 6 | 9 / 4 | 11 / 3 | | 8 / 5 |
 
-Two versions of ours ran on this sample: `ours` (fixed before the test run) and `ours_v4` (frozen at fbbf7d2 before its run). Report both. Later versions (`ours_v5`–`ours_v7`) were tuned on the 10 dev tasks and 20 unpublished test tasks (`--test --offset 70 --sample 20`). On those 30 tasks, under judge v2, `ours` passes 8, `ours_v5` 11, `ours_v6` 12 and `ours_v7` 11. They have not run on the published sample.
+Three versions of ours ran on this sample, each frozen first and run once: `ours` (before the test run), `ours_v4` (fbbf7d2) and `ours_v6` (f1e266b). Report all three. `ours_v5`–`ours_v7` were tuned on the 10 dev tasks and 20 unpublished test tasks (`--test --offset 70 --sample 20`). On those 30 tasks, under judge v2, `ours` passes 8, `ours_v5` 11, `ours_v6` 12 and `ours_v7` 11. `ours_v6` was chosen for the published run on that basis.
 
 ## Publishing a result
 
