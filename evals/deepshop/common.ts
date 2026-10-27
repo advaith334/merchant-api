@@ -26,6 +26,8 @@ export interface Answer {
   outputTokens: number;
   latencyMs: number;
   rainforestCalls: number;
+  apiCalls?: number; // calls to the provider's search API (tool-agent systems)
+  page?: unknown; // the provider's own record of a non-Amazon pick, which the judge grades instead of an Amazon page
   error?: string;
 }
 
@@ -111,6 +113,53 @@ export function trimSearchResult(r: any) {
 export async function getProduct(asin: string) {
   const data = await rainforest({ type: "product", asin });
   return trimProduct(data.product);
+}
+
+// ---------------------------------------------------------------------------
+// Product and search APIs that the comparison systems call (providers.ts).
+// Cached on disk like Rainforest, unless a provider's terms forbid caching.
+
+const API_CACHE_DIR = new URL("../.cache/", import.meta.url);
+const liveCallsByApi: Record<string, number> = {};
+export const apiLiveCalls = () => ({ ...liveCallsByApi });
+
+export function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`${name} is not set`);
+  return value;
+}
+
+export async function postJson(api: string, url: string, headers: Record<string, string>, body: unknown, cache = true): Promise<any> {
+  const id = createHash("sha256").update(url + JSON.stringify(body)).digest("hex").slice(0, 24);
+  const dir = new URL(`${api}/`, API_CACHE_DIR);
+  const file = new URL(`${id}.json`, dir);
+  if (cache && existsSync(file)) return JSON.parse(readFileSync(file, "utf8"));
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...headers },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(90_000),
+  });
+  const data = await res.json();
+  liveCallsByApi[api] = (liveCallsByApi[api] ?? 0) + 1;
+  if (!res.ok) throw new Error(`${api} ${res.status}: ${JSON.stringify(data).slice(0, 300)}`);
+  if (cache) {
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(file, JSON.stringify(data));
+  }
+  return data;
+}
+
+/** Follows redirects to the merchant's own URL (buy links can be tracking redirects). */
+export async function resolveUrl(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, { redirect: "follow", signal: AbortSignal.timeout(20_000) });
+    await res.body?.cancel();
+    return res.url || url;
+  } catch {
+    return url;
+  }
 }
 
 // ---------------------------------------------------------------------------

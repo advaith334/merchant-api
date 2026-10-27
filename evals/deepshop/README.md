@@ -50,15 +50,39 @@ The Ours row predates the relevance-search change in `ours.ts` (`97efb05`); re-r
 - **No product found (2/10)**: no retry with a different query when the first search misses.
 - **Latency (35s)**: almost all of it is live Rainforest lookups. Pre-indexing products would bring it to a few seconds.
 
+## Adjacent products
+
+`providers.ts` wraps the products an agent builder would use instead of us. Each one is the only tool of the same Claude agent (`tool_agent.ts`: Claude Opus 5.5, up to 4 searches, then it must answer), so the difference between rows is the data, not the agent.
+
+| System | What the agent searches | Key | Judged on |
+|---|---|---|---|
+| `channel3` | Channel3 catalog, any retailer | `CHANNEL3_API_KEY` | Channel3's own record |
+| `shopify_catalog` | Shopify Global Catalog over UCP (Shopify merchants, no Amazon) | none | Shopify's own record |
+| `exa` | Exa web search, amazon.com only | `EXA_API_KEY` | Amazon page |
+| `linkup` | Linkup web search, amazon.com only | `LINKUP_API_KEY` | Amazon page |
+| `parallel` | Parallel web search, amazon.com only | `PARALLEL_API_KEY` | Amazon page |
+
+Rye isn't here: its API checks out a product URL you already picked and has no search, so there is nothing to compare on choosing the product.
+
+Things to know before quoting these:
+
+- **`channel3` and `shopify_catalog` aren't apples to apples.** Neither returns Amazon products, so they pick from other retailers ("on Amazon" is dropped from the task), and the judge grades the provider's own record of the product instead of an independently fetched page. That favors them: the judge can't catch data the provider got wrong. Rating and review-count filters also use their review counts, not Amazon's.
+- **Channel3 search has no Amazon offers** (checked 2026-10-27). amazon.com is in its website list, but filtering search on it, by domain or by website id, returns nothing, and unfiltered results come from Walmart, Best Buy, Adorama and others.
+- **Shopify is keyless** and uses Shopify's example agent profile unless `SHOPIFY_AGENT_PROFILE` points to your own. Its terms forbid caching catalog results, so its searches are never cached and re-runs make live calls.
+- **Cost:** each tool-agent task is up to 5 Opus calls plus up to 4 provider searches, then the judge. Other providers' responses are cached in `evals/.cache/<provider>/`.
+
 ## Running it
 
 Needs `ANTHROPIC_API_KEY` and `RAINFOREST_API_KEY` in `.env`. Rainforest responses are cached in `evals/.cache/` so re-runs cost no credits. A full 150-task run needs about 600 Rainforest credits.
 
 ```bash
-node --env-file=.env evals/deepshop/run.ts --pilot            # 10 tasks, both systems
+node --env-file=.env evals/deepshop/run.ts --pilot            # 10 tasks, every system whose keys are set
 node --env-file=.env evals/deepshop/run.ts --system ours      # all 150, ours only
+node --env-file=.env evals/deepshop/run.ts --pilot --system channel3,shopify_catalog   # a comma-separated subset
 node --env-file=.env evals/deepshop/run.ts --pilot --report   # print the table without running
 ```
+
+The adjacent-product systems also need the keys in the table above; `--system all` skips any whose keys are missing and says so.
 
 Browser Use runs from Python (3.12) with its own Chromium:
 

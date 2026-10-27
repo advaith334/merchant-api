@@ -1,12 +1,15 @@
-// Usage: node --env-file=.env evals/deepshop/run.ts [--system ours|baseline|all] [--pilot | --limit N] [--report | --judge-pending]
+// Usage: node --env-file=.env evals/deepshop/run.ts [--system all|<name>[,<name>...]] [--pilot | --limit N] [--report | --judge-pending]
+// Systems: ours, baseline, and one per provider in providers.ts. `all` runs every system whose API keys are set.
 // --judge-pending judges answers written by other runners (browser_use/run.py) that have no verdict yet.
 // Results append to evals/deepshop/results/{answers,verdicts}.jsonl; finished tasks are skipped on re-run.
 
 import { parseArgs } from "node:util";
-import { appendJsonl, loadTasks, rainforestLiveCalls, readJsonl, type Answer, type Task } from "./common.ts";
+import { apiLiveCalls, appendJsonl, loadTasks, rainforestLiveCalls, readJsonl, type Answer, type Task } from "./common.ts";
 import { runOurs } from "./ours.ts";
 import { runBaseline } from "./baseline.ts";
 import { judge, type Verdict } from "./judge.ts";
+import { PROVIDERS } from "./providers.ts";
+import { toolAgent } from "./tool_agent.ts";
 
 const { values: args } = parseArgs({
   options: {
@@ -21,13 +24,24 @@ const { values: args } = parseArgs({
 
 const ANSWERS = new URL("./results/answers.jsonl", import.meta.url);
 const VERDICTS = new URL("./results/verdicts.jsonl", import.meta.url);
-const SYSTEMS: Record<string, (t: Task) => Promise<Answer>> = { ours: runOurs, baseline: runBaseline };
+const SYSTEMS: Record<string, (t: Task) => Promise<Answer>> = {
+  ours: runOurs,
+  baseline: runBaseline,
+  ...Object.fromEntries(PROVIDERS.map((p) => [p.system, toolAgent(p)])),
+};
 const REPORTED = [...Object.keys(SYSTEMS), "browser_use"];
+const missingEnv = (system: string) => (PROVIDERS.find((p) => p.system === system)?.env ?? []).filter((e) => !process.env[e]);
 
 let tasks = loadTasks();
 if (args.pilot) tasks = tasks.filter((_, i) => i % 15 === 0); // 10 tasks spread over categories and difficulties
 if (args.limit) tasks = tasks.slice(0, Number(args.limit));
-const systems = args.system === "all" ? Object.keys(SYSTEMS) : [args.system!];
+let systems = args.system === "all" ? Object.keys(SYSTEMS) : args.system!.split(",");
+for (const s of systems) {
+  if (!SYSTEMS[s]) throw new Error(`unknown system ${s}; known: ${Object.keys(SYSTEMS).join(", ")}`);
+  const missing = missingEnv(s);
+  if (missing.length && !args.report) console.log(`skipping ${s}: ${missing.join(", ")} not set`);
+}
+systems = systems.filter((s) => !missingEnv(s).length);
 
 async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   const queue = [...items];
@@ -62,6 +76,7 @@ if (args["judge-pending"]) {
     });
   }
   console.log(`rainforest live calls this run: ${rainforestLiveCalls()}`);
+  console.log(`provider live calls this run: ${JSON.stringify(apiLiveCalls())}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -92,6 +107,7 @@ const rows = REPORTED.map((system) => {
     "median tokens": median(a.map((x) => x.inputTokens + x.outputTokens)),
     "median latency s": +(median(a.map((x) => x.latencyMs)) / 1000).toFixed(1),
     "amazon calls/task": +(a.reduce((s, x) => s + x.rainforestCalls, 0) / a.length).toFixed(1),
+    "api calls/task": +(a.reduce((s, x) => s + (x.apiCalls ?? 0), 0) / a.length).toFixed(1),
   };
 }).filter(Boolean);
 console.table(rows);

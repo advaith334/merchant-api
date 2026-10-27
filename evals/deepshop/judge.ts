@@ -40,7 +40,9 @@ function parseVerdict(text: string): boolean {
 }
 
 export async function judge(task: Task, answer: Answer): Promise<Verdict> {
-  const page = answer.asin ? await getProduct(answer.asin).catch(() => null) : null;
+  // Amazon picks: the Amazon page, fetched independently. Non-Amazon picks (channel3,
+  // shopify_catalog): the provider's own record of the product, as the agent saw it.
+  const page = answer.asin ? await getProduct(answer.asin).catch(() => null) : (answer.page ?? null);
   const dims: Partial<Record<Dim, boolean>> = {};
   let tokens = 0;
 
