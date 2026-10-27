@@ -4,10 +4,10 @@
 // --offset M skips the first M of that order, e.g. `--test --offset 70 --sample 20` for test tasks outside the published 70.
 // AMAZON_DATA=scraperapi switches the Amazon data source; its results go to results/scraperapi/.
 // AMAZON_SEARCH=serpapi sends only searches to SerpApi; AMAZON_MAX_LIVE_CALLS caps uncached Amazon lookups.
-// Systems: ours, ours_jev/ours_v2/ours_v3/ours_v4 (need TYPESAFE_API_KEY), baseline, and one per provider in providers.ts. `all` runs every system whose API keys are set.
+// Systems: ours, ours_jev, ours_v2 to ours_v6 (need TYPESAFE_API_KEY), baseline, and one per provider in providers.ts. `all` runs every system whose API keys are set.
 // --judge-pending judges answers written by other runners (browser_use/run.py) that have no verdict yet.
 // --rejudge judges the selected systems' latest answers again (to record the judge's reasons); the new verdicts replace the old.
-// It skips answers whose latest verdict already has reasons, so an interrupted re-judge resumes.
+// It skips answers already judged by the current judge version, so an interrupted re-judge resumes.
 // --rerun runs tasks again even if they have an answer; the new answer replaces the old in the report.
 // Results append to evals/deepshop/results/{answers,verdicts}.jsonl; finished tasks are skipped on re-run.
 
@@ -15,9 +15,9 @@ import { createHash } from "node:crypto";
 import { parseArgs } from "node:util";
 import { AMAZON_DATA, apiLiveCalls, appendJsonl, loadTasks, amazonLiveCalls, readJsonl, type Answer, type Task } from "./common.ts";
 import { runOurs } from "./ours.ts";
-import { runOursJev, runOursV2, runOursV3, runOursV4 } from "./ours_jev.ts";
+import { runOursJev, runOursV2, runOursV3, runOursV4, runOursV5, runOursV6, runOursV7 } from "./ours_jev.ts";
 import { runBaseline } from "./baseline.ts";
-import { judge, type Verdict } from "./judge.ts";
+import { JUDGE_VERSION, judge, type Verdict } from "./judge.ts";
 import { PROVIDERS } from "./providers.ts";
 import { toolAgent } from "./tool_agent.ts";
 
@@ -46,11 +46,14 @@ const SYSTEMS: Record<string, (t: Task) => Promise<Answer>> = {
   ours_v2: runOursV2,
   ours_v3: runOursV3,
   ours_v4: runOursV4,
+  ours_v5: runOursV5,
+  ours_v6: runOursV6,
+  ours_v7: runOursV7,
   baseline: runBaseline,
   ...Object.fromEntries(PROVIDERS.map((p) => [p.system, toolAgent(p)])),
 };
 const REPORTED = [...Object.keys(SYSTEMS), "browser_use"];
-const ENV: Record<string, string[]> = { ours_jev: ["TYPESAFE_API_KEY"], ours_v2: ["TYPESAFE_API_KEY"], ours_v3: ["TYPESAFE_API_KEY"], ours_v4: ["TYPESAFE_API_KEY"], ...Object.fromEntries(PROVIDERS.map((p) => [p.system, p.env])) };
+const ENV: Record<string, string[]> = { ours_jev: ["TYPESAFE_API_KEY"], ours_v2: ["TYPESAFE_API_KEY"], ours_v3: ["TYPESAFE_API_KEY"], ours_v4: ["TYPESAFE_API_KEY"], ours_v5: ["TYPESAFE_API_KEY"], ours_v6: ["TYPESAFE_API_KEY"], ours_v7: ["TYPESAFE_API_KEY"], ...Object.fromEntries(PROVIDERS.map((p) => [p.system, p.env])) };
 const missingEnv = (system: string) => (ENV[system] ?? []).filter((e) => !process.env[e]);
 
 let tasks = loadTasks();
@@ -78,7 +81,7 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
 if (args["judge-pending"] || args.rejudge) {
   const byId = new Map(tasks.map((t) => [t.id, t]));
   const latestVerdicts = new Map(readJsonl<Verdict>(VERDICTS).map((v) => [`${v.system}:${v.taskId}`, v]));
-  const judged = new Set([...latestVerdicts].filter(([, v]) => !args.rejudge || v.reasons).map(([k]) => k));
+  const judged = new Set([...latestVerdicts].filter(([, v]) => !args.rejudge || v.judgeVersion === JUDGE_VERSION).map(([k]) => k));
   const latestAnswers = new Map(readJsonl<Answer>(ANSWERS).filter((a) => !a.error).map((a) => [`${a.system}:${a.taskId}`, a]));
   const pending = [...latestAnswers.values()].filter((a) =>
     byId.has(a.taskId) && !judged.has(`${a.system}:${a.taskId}`) && (!args.rejudge || systems.includes(a.system)));

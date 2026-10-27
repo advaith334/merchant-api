@@ -287,6 +287,56 @@ export async function getProduct(asin: string) {
   return trimProduct(data.product);
 }
 
+// Sections of a full Amazon product page, by element id, and how much of each to keep. The structured
+// endpoint leaves out what the judge kept failing tasks on: returns, the size list, ships-from, rank.
+const PAGE_SECTIONS: [id: string, chars: number][] = [
+  ["productTitle", 300], ["acrPopover", 120], ["acrCustomerReviewText", 80], ["corePrice_feature_div", 300],
+  ["apex_desktop", 400], ["tabular-buybox", 600], ["offer-display-features", 800], ["deliveryBlockMessage", 300],
+  ["twister_feature_div", 1500], ["inline-twister-row-size_name", 1000], ["feature-bullets", 1500],
+  ["detailBullets_feature_div", 1500], ["productDetails_techSpec_section_1", 1500], ["productDetails_detailBullets_sections1", 1200],
+  ["rpi-attribute-book_details-publication_date", 200], ["bookDescription_feature_div", 600],
+];
+
+const pageText = (html: string) =>
+  html
+    .replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&#39;/g, "'").replace(/&quot;/g, '"')
+    .replace(/[\u200e\u200f]|&[lr]rm;/g, "")
+    .replace(/P\.(?:register|when)\([\s\S]*$/, "") // inline scripts cut off mid-section
+    .replace(/\s+/g, " ")
+    .trim();
+
+export function extractPageText(html: string) {
+  const parts = PAGE_SECTIONS.flatMap(([id, chars]) => {
+    const at = html.indexOf(`id="${id}"`);
+    if (at < 0) return [];
+    const text = pageText(html.slice(html.lastIndexOf("<", at), at + 40_000)).slice(0, chars);
+    return text ? [`[${id}] ${text}`] : [];
+  });
+  // The returns line lives in different containers on different pages.
+  const full = pageText(html);
+  const returns = full.search(/FREE Returns|Returns? (?:policy|this item)|\d+-day (?:refund|return)/i);
+  if (returns >= 0) parts.push(`[returns] ${full.slice(returns, returns + 300)}`);
+  return parts.join("\n").slice(0, 9000) || null;
+}
+
+/** Key sections of the full Amazon product page as text (ScraperAPI only), cached. */
+export async function amazonPageText(asin: string): Promise<string | null> {
+  if (AMAZON_DATA !== "scraperapi") return null;
+  const cache = cached("scraperapi-page", { asin });
+  const hit = cache.get();
+  if (hit !== undefined) return hit;
+  const key = requireEnv("SCRAPERAPI_API_KEY");
+  spendLiveCall();
+  const url = `https://api.scraperapi.com/?${new URLSearchParams({ api_key: key, url: `https://www.amazon.com/dp/${asin}`, country_code: "us" })}`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
+  if (!res.ok) throw new Error(`scraperapi page ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const text = extractPageText(await res.text());
+  cache.set(text);
+  return text;
+}
+
 // ---------------------------------------------------------------------------
 // Product and search APIs that the comparison systems call (providers.ts).
 // Cached on disk like Rainforest, unless a provider's terms forbid caching.

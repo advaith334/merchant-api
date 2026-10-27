@@ -4,7 +4,13 @@
 // sub-criterion (attribute / filter / sort) is judged separately and a task
 // succeeds only if every applicable one does (strict_rule_eval_overall.py).
 
-import { MODEL, client, getProduct, usageOf, type Answer, type Task } from "./common.ts";
+import { MODEL, amazonPageText, client, getProduct, usageOf, type Answer, type Task } from "./common.ts";
+
+/**
+ * 2: Amazon picks are judged on the structured page plus the full page's key sections (returns, sizes,
+ * ships-from, rank), closer to the paper's screenshots. 1: structured page only.
+ */
+export const JUDGE_VERSION = 2;
 
 const SYSTEM_PROMPT = `As an evaluator, you will be presented with three primary components to assist you in your role:
 
@@ -31,6 +37,7 @@ export interface Verdict {
   dims: Partial<Record<Dim, boolean>>;
   success: boolean;
   judgeTokens: number;
+  judgeVersion?: number;
   /** The judge's explanation for each dimension it failed, to diagnose failures. Doesn't affect the verdict. */
   reasons?: Partial<Record<Dim, string>>;
 }
@@ -44,7 +51,9 @@ function parseVerdict(text: string): boolean {
 export async function judge(task: Task, answer: Answer): Promise<Verdict> {
   // Amazon picks: the Amazon page, fetched independently. Non-Amazon picks (channel3,
   // shopify_catalog): the provider's own record of the product, as the agent saw it.
-  const page = answer.asin ? await getProduct(answer.asin).catch(() => null) : (answer.page ?? null);
+  const product = answer.asin ? await getProduct(answer.asin).catch(() => null) : null;
+  const fullPage = product ? await amazonPageText(answer.asin!).catch(() => null) : null;
+  const page = answer.asin ? (product && fullPage ? { ...product, full_page: fullPage } : product) : (answer.page ?? null);
   const dims: Partial<Record<Dim, boolean>> = {};
   const reasons: Partial<Record<Dim, string>> = {};
   let tokens = 0;
@@ -75,6 +84,7 @@ export async function judge(task: Task, answer: Answer): Promise<Verdict> {
     dims,
     success: Object.values(dims).every(Boolean) && page != null,
     judgeTokens: tokens,
+    judgeVersion: JUDGE_VERSION,
     reasons,
   };
 }

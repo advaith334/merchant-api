@@ -20,7 +20,7 @@ A 10-task pilot (every 15th task: all 5 categories, easy and medium only; no har
 - **Baseline** (`baseline.ts`): Claude Opus 5.5 with web search and web fetch, told to shop on Amazon. This stands in for how agents shop today.
 - **Browser Use** (`browser_use/run.py`): the open-source [browser-use](https://github.com/browser-use/browser-use) agent (0.13) driving a real headless Chromium on live Amazon, like the web agents in the paper. It runs on Claude Opus 5, not 5.5: browser-use forces a tool call on every step, which Opus 5.5 rejects. We set `use_thinking=False` because Opus 5 refuses to fill browser-use's `thinking` output field. Told to stop rather than solve a CAPTCHA.
 
-**Judge** (`judge.ts`): the paper's judge prompt word for word, with one change. The paper's judge looks at screenshots of the agent browsing; we don't browse, so the judge gets data from the chosen product's Amazon page instead, fetched independently of every system. The judge model is Claude Opus 5.5 rather than GPT-4o (no OpenAI key yet). Report results as "DeepShop (product-page judge)".
+**Judge** (`judge.ts`): the paper's judge prompt word for word, with one change. The paper's judge looks at screenshots of the agent browsing; we don't browse, so the judge gets data from the chosen product's Amazon page instead, fetched independently of every system (with ScraperAPI, the structured product data plus the key sections of the full page, from judge version 2). As in the paper, each of attribute, filter and sort is graded against its own sub-task. The judge model is Claude Opus 5.5 rather than GPT-4o (no OpenAI key yet). Report results as "DeepShop (product-page judge)".
 
 ## Results (pilot, 10/150 tasks, 2026-10-27)
 
@@ -38,6 +38,33 @@ A 10-task pilot (every 15th task: all 5 categories, easy and medium only; no har
 Success is over all 10 tasks: a task a system never answered counts as a failure (Browser Use hit a CAPTCHA on `Amazon--54`). The intervals all overlap, so **10 tasks can't separate these systems**; what the pilot does show is the token gap (3x fewer than Shopify's catalog, 12x fewer than the baseline, 50x fewer than Browser Use). Browser Use cost $13.44 in API fees for the 10 tasks. One of its tasks hit a browser start-up timeout on our machine and was re-run.
 
 These 10 tasks are also our **dev set**: we looked at every failure and changed `ours.ts` because of them, so they overstate us. Report the test set (below), not these.
+
+## Results (test sample, 70 of the 140 test tasks, ScraperAPI, 2026-10-27)
+
+The published sample is `--test --sample 70`. No system was tuned on it. Judge version 2 (`JUDGE_VERSION = 2`) adds the key sections of the full Amazon product page (price box, ships-from, returns, size list, bullets, details, best-seller rank) to the structured product data. That brings it closer to the paper's judge, which sees the page itself. Judge version 1 had only the structured data, which has no returns policy, no ships-from and often no size list, so it failed correct picks it couldn't confirm.
+
+| | Success | 95% CI | Attribute | Filter | Sort | Median tokens/task | Judge v1 |
+|---|---|---|---|---|---|---|---|
+| **Ours** (`ours.ts`) | **29%** | 19–40% | 61% | 53% | 28% | **~7k** | 19% |
+| Parallel | 26% | 17–37% | 57% | 47% | 26% | ~32k | 20% |
+| Ours, low-token (`ours_v4`) | 24% | 16–35% | 49% | 42% | 35% | ~1.6k | 16% |
+| Baseline (Claude + web search) | 23% | 15–34% | 60% | 42% | 28% | ~91k | 23% |
+| Exa | 23% | 15–34% | 53% | 42% | 33% | ~28k | 16% |
+| Tavily | 21% | 13–32% | 50% | 40% | 19% | ~30k | 19% |
+| Linkup | 17% | 10–28% | 60% | 34% | 26% | ~39k | 11% |
+| Shopify Catalog* | 16% | 9–26% | 67% | 21% | 21% | ~37k | |
+| Google Shopping* | 13% | 7–23% | 46% | 26% | 14% | ~15k | |
+| Channel3* | 9% | 4–17% | 44% | 18% | 26% | ~63k | |
+
+\*Judged on the provider's own record, so the full-page change doesn't apply; see [Adjacent products](#adjacent-products).
+
+The intervals overlap, so lead with the paired comparison. Over the same 70 tasks, ours passes a task the other fails more often than the reverse, against every system:
+
+| Ours vs | Parallel | Baseline | Exa | Tavily | Linkup | `ours_v4` |
+|---|---|---|---|---|---|---|
+| Ours wins / loses | 8 / 6 | 9 / 5 | 10 / 6 | 9 / 4 | 11 / 3 | 8 / 5 |
+
+Two versions of ours ran on this sample: `ours` (fixed before the test run) and `ours_v4` (frozen at fbbf7d2 before its run). Report both. Later versions (`ours_v5`–`ours_v7`) were tuned on the 10 dev tasks and 20 unpublished test tasks (`--test --offset 70 --sample 20`). On those 30 tasks, under judge v2, `ours` passes 8, `ours_v5` 11, `ours_v6` 12 and `ours_v7` 11. They have not run on the published sample.
 
 ## Publishing a result
 
