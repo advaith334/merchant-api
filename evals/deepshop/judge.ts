@@ -31,6 +31,8 @@ export interface Verdict {
   dims: Partial<Record<Dim, boolean>>;
   success: boolean;
   judgeTokens: number;
+  /** The judge's explanation for each dimension it failed, to diagnose failures. Doesn't affect the verdict. */
+  reasons?: Partial<Record<Dim, string>>;
 }
 
 function parseVerdict(text: string): boolean {
@@ -44,6 +46,7 @@ export async function judge(task: Task, answer: Answer): Promise<Verdict> {
   // shopify_catalog): the provider's own record of the product, as the agent saw it.
   const page = answer.asin ? await getProduct(answer.asin).catch(() => null) : (answer.page ?? null);
   const dims: Partial<Record<Dim, boolean>> = {};
+  const reasons: Partial<Record<Dim, string>> = {};
   let tokens = 0;
 
   for (const dim of ["attribute", "filter", "sort"] as const) {
@@ -63,6 +66,7 @@ export async function judge(task: Task, answer: Answer): Promise<Verdict> {
     tokens += u.input + u.output;
     const text = msg.content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("");
     dims[dim] = parseVerdict(text);
+    if (!dims[dim]) reasons[dim] = text.slice(-1500);
   }
 
   return {
@@ -71,5 +75,6 @@ export async function judge(task: Task, answer: Answer): Promise<Verdict> {
     dims,
     success: Object.values(dims).every(Boolean) && page != null,
     judgeTokens: tokens,
+    reasons,
   };
 }

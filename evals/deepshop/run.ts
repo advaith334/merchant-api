@@ -3,15 +3,18 @@
 // --sample N keeps a fixed pseudo-random N of the selected tasks (ordered by a hash of the task id);
 // --offset M skips the first M of that order, e.g. `--test --offset 70 --sample 20` for test tasks outside the published 70.
 // AMAZON_DATA=scraperapi switches the Amazon data source; its results go to results/scraperapi/.
-// Systems: ours, ours_jev (needs TYPESAFE_API_KEY), baseline, and one per provider in providers.ts. `all` runs every system whose API keys are set.
+// AMAZON_SEARCH=serpapi sends only searches to SerpApi; AMAZON_MAX_LIVE_CALLS caps uncached Amazon lookups.
+// Systems: ours, ours_jev/ours_v2/ours_v3/ours_v4 (need TYPESAFE_API_KEY), baseline, and one per provider in providers.ts. `all` runs every system whose API keys are set.
 // --judge-pending judges answers written by other runners (browser_use/run.py) that have no verdict yet.
+// --rejudge judges the selected systems' latest answers again (to record the judge's reasons); the new verdicts replace the old.
+// It skips answers whose latest verdict already has reasons, so an interrupted re-judge resumes.
 // Results append to evals/deepshop/results/{answers,verdicts}.jsonl; finished tasks are skipped on re-run.
 
 import { createHash } from "node:crypto";
 import { parseArgs } from "node:util";
 import { AMAZON_DATA, apiLiveCalls, appendJsonl, loadTasks, amazonLiveCalls, readJsonl, type Answer, type Task } from "./common.ts";
 import { runOurs } from "./ours.ts";
-import { runOursJev } from "./ours_jev.ts";
+import { runOursJev, runOursV2, runOursV3, runOursV4 } from "./ours_jev.ts";
 import { runBaseline } from "./baseline.ts";
 import { judge, type Verdict } from "./judge.ts";
 import { PROVIDERS } from "./providers.ts";
@@ -27,6 +30,7 @@ const { values: args } = parseArgs({
     limit: { type: "string" },
     report: { type: "boolean", default: false },
     "judge-pending": { type: "boolean", default: false },
+    rejudge: { type: "boolean", default: false },
     concurrency: { type: "string", default: "3" },
   },
 });
@@ -37,11 +41,14 @@ const VERDICTS = new URL(`${RESULTS}verdicts.jsonl`, import.meta.url);
 const SYSTEMS: Record<string, (t: Task) => Promise<Answer>> = {
   ours: runOurs,
   ours_jev: runOursJev,
+  ours_v2: runOursV2,
+  ours_v3: runOursV3,
+  ours_v4: runOursV4,
   baseline: runBaseline,
   ...Object.fromEntries(PROVIDERS.map((p) => [p.system, toolAgent(p)])),
 };
 const REPORTED = [...Object.keys(SYSTEMS), "browser_use"];
-const ENV: Record<string, string[]> = { ours_jev: ["TYPESAFE_API_KEY"], ...Object.fromEntries(PROVIDERS.map((p) => [p.system, p.env])) };
+const ENV: Record<string, string[]> = { ours_jev: ["TYPESAFE_API_KEY"], ours_v2: ["TYPESAFE_API_KEY"], ours_v3: ["TYPESAFE_API_KEY"], ours_v4: ["TYPESAFE_API_KEY"], ...Object.fromEntries(PROVIDERS.map((p) => [p.system, p.env])) };
 const missingEnv = (system: string) => (ENV[system] ?? []).filter((e) => !process.env[e]);
 
 let tasks = loadTasks();
@@ -66,12 +73,21 @@ async function pool<T>(items: T[], n: number, fn: (x: T) => Promise<void>) {
   await Promise.all(Array.from({ length: n }, async () => { for (let x; (x = queue.shift()); ) await fn(x); }));
 }
 
-if (args["judge-pending"]) {
+if (args["judge-pending"] || args.rejudge) {
   const byId = new Map(tasks.map((t) => [t.id, t]));
-  const judged = new Set(readJsonl<Verdict>(VERDICTS).map((v) => `${v.system}:${v.taskId}`));
-  const pending = readJsonl<Answer>(ANSWERS).filter((a) => !a.error && byId.has(a.taskId) && !judged.has(`${a.system}:${a.taskId}`));
+  const latestVerdicts = new Map(readJsonl<Verdict>(VERDICTS).map((v) => [`${v.system}:${v.taskId}`, v]));
+  const judged = new Set([...latestVerdicts].filter(([, v]) => !args.rejudge || v.reasons).map(([k]) => k));
+  const latestAnswers = new Map(readJsonl<Answer>(ANSWERS).filter((a) => !a.error).map((a) => [`${a.system}:${a.taskId}`, a]));
+  const pending = [...latestAnswers.values()].filter((a) =>
+    byId.has(a.taskId) && !judged.has(`${a.system}:${a.taskId}`) && (!args.rejudge || systems.includes(a.system)));
   await pool(pending, Number(args.concurrency), async (a) => {
-    const v = await judge(byId.get(a.taskId)!, a);
+    let v: Verdict;
+    try {
+      v = await judge(byId.get(a.taskId)!, a);
+    } catch (err) {
+      console.log(`judge ${a.system} ${a.taskId} ERROR ${String(err).slice(0, 120)}`); // left pending for the next run
+      return;
+    }
     appendJsonl(VERDICTS, v);
     console.log(`judge ${a.system} ${a.taskId} ${v.success ? "SUCCESS" : "NOT SUCCESS"} ${JSON.stringify(v.dims)}`);
   });

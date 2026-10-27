@@ -49,10 +49,53 @@ export function asinFromUrl(url: string | null | undefined): string | null {
 export const AMAZON_DATA = process.env.AMAZON_DATA === "scraperapi" ? "scraperapi" : "rainforest";
 let liveCalls = 0;
 export const amazonLiveCalls = () => liveCalls;
+/** AMAZON_MAX_LIVE_CALLS caps uncached Amazon lookups per run, so an experiment can't spend a free tier's last credits. */
+const MAX_LIVE_CALLS = Number(process.env.AMAZON_MAX_LIVE_CALLS ?? Infinity);
+const spendLiveCall = () => {
+  if (liveCalls >= MAX_LIVE_CALLS) throw new Error(`AMAZON_MAX_LIVE_CALLS (${MAX_LIVE_CALLS}) reached`);
+  liveCalls++;
+};
 
 /** `{type: "search", search_term, sort_by}` or `{type: "product", asin}`, in Rainforest's response shape. */
 export async function amazon(params: Record<string, string>): Promise<any> {
+  if (params.type === "search" && AMAZON_SEARCH === "serpapi") return serpApiAmazonSearch(params);
   return AMAZON_DATA === "scraperapi" ? scraperApi(params) : rainforest(params);
+}
+
+/**
+ * AMAZON_SEARCH=serpapi sends searches (not product pages) to SerpApi's Amazon engine, which takes the
+ * same sort codes and filters. The judge only reads product pages, so it still sees AMAZON_DATA.
+ */
+export const AMAZON_SEARCH = process.env.AMAZON_SEARCH === "serpapi" ? "serpapi" : AMAZON_DATA;
+
+// https://serpapi.com/amazon-search-api
+async function serpApiAmazonSearch(params: Record<string, string>): Promise<any> {
+  const key = process.env.SERPAPI_API_KEY;
+  if (!key) throw new Error("SERPAPI_API_KEY is not set");
+  const cache = cached("serpapi-amazon", params);
+  let raw = cache.get();
+  if (!raw) {
+    const q = new URLSearchParams({ engine: "amazon", amazon_domain: "amazon.com", k: params.search_term, api_key: key });
+    if (AMAZON_SORT[params.sort_by]) q.set("s", AMAZON_SORT[params.sort_by]);
+    if (params.refinements) q.set("rh", params.refinements);
+    spendLiveCall();
+    const res = await fetch(`https://serpapi.com/search.json?${q}`, { signal: AbortSignal.timeout(120_000) });
+    raw = await res.json();
+    if (!res.ok || (raw.error && !/hasn't returned any results/i.test(raw.error))) throw new Error(`serpapi ${res.status}: ${String(raw.error).slice(0, 300)}`);
+    cache.set(raw);
+  }
+  return {
+    search_results: (raw.organic_results ?? []).filter((r: any) => r.asin).map((r: any) => ({
+      asin: r.asin,
+      title: r.title,
+      price: { value: r.extracted_price ?? null },
+      rating: r.rating ?? null,
+      ratings_total: r.reviews ?? null,
+      // No Prime flag; searches filtered on Prime (p_85) return only Prime items.
+      is_prime: /(^|,)p_85:2470955011/.test(params.refinements ?? "") || null,
+      sponsored: r.sponsored ?? false,
+    })),
+  };
 }
 
 function cached(source: string, params: Record<string, string>) {
@@ -73,11 +116,11 @@ async function rainforest(params: Record<string, string>): Promise<any> {
   const hit = cache.get();
   if (hit) return hit;
 
+  spendLiveCall();
   const res = await fetch(`https://api.rainforestapi.com/request?${new URLSearchParams({ api_key: key, ...q })}`, {
     signal: AbortSignal.timeout(90_000),
   });
   const data = await res.json();
-  liveCalls++;
   if (!res.ok || data?.request_info?.success === false) {
     throw new Error(`rainforest ${res.status}: ${JSON.stringify(data?.request_info ?? data).slice(0, 300)}`);
   }
@@ -107,6 +150,8 @@ async function scraperApi(params: Record<string, string>): Promise<any> {
       amazonUrl.searchParams.set("k", params.search_term);
       const sort = AMAZON_SORT[params.sort_by];
       if (sort) amazonUrl.searchParams.set("s", sort);
+      // Amazon's own search filters, e.g. "p_36:2500-5000" (price in cents) or "p_85:2470955011" (Prime).
+      if (params.refinements) amazonUrl.searchParams.set("rh", params.refinements);
       url = `https://api.scraperapi.com/?${new URLSearchParams({ api_key: key, url: amazonUrl.href, autoparse: "true", country_code: "us" })}`;
     } else {
       url = `https://api.scraperapi.com/structured/amazon/product?${new URLSearchParams({ api_key: key, asin: params.asin, country_code: "us", tld: "com" })}`;
@@ -114,8 +159,8 @@ async function scraperApi(params: Record<string, string>): Promise<any> {
     // Searches and product pages occasionally come back empty; one retry, then the
     // empty result is cached so every system (and the judge) sees the same thing.
     for (let attempt = 0; attempt < 2; attempt++) {
+      spendLiveCall();
       const res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
-      liveCalls++;
       const text = await res.text();
       if (!res.ok) throw new Error(`scraperapi ${res.status}: ${text.slice(0, 300)}`);
       raw = JSON.parse(text);
@@ -156,6 +201,10 @@ function fromScraperApiProduct(p: any, asin: string) {
   );
   // Rainforest puts the selected size/color in the title; ScraperAPI marks it in the options.
   const selected = options.flatMap(([dim, opts]) => opts.filter((o: any) => o.is_selected && o.value).map((o: any) => `${dim}: ${o.value}`));
+  // Rank, dates and warranty first, so trimming the spec list never drops them.
+  const KEY_INFO = ["best_sellers_rank", "date_first_available", "publication_date", "release_date", "warranty_description", "product_warranty"];
+  const infoEntries = Object.entries(info).sort(([a], [b]) => Number(KEY_INFO.includes(b)) - Number(KEY_INFO.includes(a)));
+  const shipsFrom = String(p.ships_from ?? "").split(/\s{2,}|\n/)[0].trim() || null;
   return {
     product: {
       asin,
@@ -169,12 +218,14 @@ function fromScraperApiProduct(p: any, asin: string) {
         availability: { raw: p.availability_status ?? null },
         fulfillment: { standard_delivery: { text: [p.shipping_price, p.shipping_time].filter(Boolean).join(", ") || null } },
       },
+      ships_from: shipsFrom,
+      fulfilled_by_amazon: p.fulfilled_by_amazon ?? null,
       rating,
       ratings_total: p.total_reviews ?? null,
       categories: String(p.product_category ?? "").split("›").map((name) => ({ name: name.trim() })).filter((c) => c.name),
       first_available: (info.date_first_available ?? info["Date First Available"]) ? { raw: info.date_first_available ?? info["Date First Available"] } : null,
       feature_bullets: p.feature_bullets ?? [],
-      specifications: Object.entries(info).map(([name, value]) => ({ name, value: typeof value === "string" ? value : JSON.stringify(value) })),
+      specifications: infoEntries.map(([name, value]) => ({ name, value: typeof value === "string" ? value : JSON.stringify(value) })),
       description: String(p.full_description ?? "").replace(/\s+/g, " ").slice(0, 1000),
       sold_by: p.sold_by ?? null,
       top_reviews: (p.reviews ?? []).map((r: any) => ({ rating: r.stars ?? r.rating, title: r.title, body: r.review ?? r.body })),
@@ -207,6 +258,8 @@ export function trimProduct(p: any) {
     // ScraperAPI pages often have no bullets; the description carries the same facts.
     ...(p.feature_bullets?.length ? {} : { description: String(p.description ?? "").slice(0, 1000) || null }),
     ...(p.sold_by ? { sold_by: p.sold_by } : {}),
+    ...(p.ships_from ? { ships_from: p.ships_from } : {}),
+    ...(p.fulfilled_by_amazon != null ? { fulfilled_by_amazon: p.fulfilled_by_amazon } : {}),
     specifications: (p.specifications ?? []).slice(0, 25).map((s: any) => `${s.name}: ${s.value}`),
     top_reviews: (p.top_reviews ?? []).slice(0, 3).map((r: any) => ({
       rating: r.rating,
