@@ -8,6 +8,7 @@
 // --judge-pending judges answers written by other runners (browser_use/run.py) that have no verdict yet.
 // --rejudge judges the selected systems' latest answers again (to record the judge's reasons); the new verdicts replace the old.
 // It skips answers whose latest verdict already has reasons, so an interrupted re-judge resumes.
+// --rerun runs tasks again even if they have an answer; the new answer replaces the old in the report.
 // Results append to evals/deepshop/results/{answers,verdicts}.jsonl; finished tasks are skipped on re-run.
 
 import { createHash } from "node:crypto";
@@ -31,6 +32,7 @@ const { values: args } = parseArgs({
     report: { type: "boolean", default: false },
     "judge-pending": { type: "boolean", default: false },
     rejudge: { type: "boolean", default: false },
+    rerun: { type: "boolean", default: false },
     concurrency: { type: "string", default: "3" },
   },
 });
@@ -93,7 +95,7 @@ if (args["judge-pending"] || args.rejudge) {
   });
 } else if (!args.report) {
   for (const system of systems) {
-    const done = new Set(readJsonl<Answer>(ANSWERS).filter((a) => a.system === system && !a.error).map((a) => a.taskId));
+    const done = new Set(args.rerun ? [] : readJsonl<Answer>(ANSWERS).filter((a) => a.system === system && !a.error).map((a) => a.taskId));
     await pool(tasks.filter((t) => !done.has(t.id)), Number(args.concurrency), async (task) => {
       let answer: Answer;
       try {
