@@ -30,6 +30,10 @@
 //
 // ours_v8 is ours_v6 with fewer tokens: the final choice gets each structured field (bullets,
 // specifications, description) only when the full page doesn't already carry that section.
+//
+// ours_v9 is ours_v6's data with ours_v3's cheap choosing: Jev's checks (which now see the full
+// page) pick the product and variant, and the answer is the verified-facts template, so Claude
+// only compiles the query (and answers any extra question the task asks).
 
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
@@ -93,6 +97,7 @@ export const runOursV5 = oursJev("ours_v5", 5);
 export const runOursV6 = oursJev("ours_v6", 6);
 export const runOursV7 = oursJev("ours_v7", 7);
 export const runOursV8 = oursJev("ours_v8", 8);
+export const runOursV9 = oursJev("ours_v9", 9);
 
 /** ours_v8: a page without the structured fields its full-page text already covers. */
 function lean(page: any) {
@@ -108,6 +113,7 @@ function lean(page: any) {
 
 function oursJev(system: string, version: number) {
   const v2 = version >= 2, v3 = version >= 3, v4 = version === 4, v5 = version >= 5, v6 = version >= 6, v7 = version === 7, v8 = version === 8;
+  const claudePicks = v5 && version !== 9;
   return async function run(task: Task): Promise<Answer> {
     const t0 = Date.now();
     let input = 0, output = 0, calls = 0, jevTokens = 0;
@@ -260,7 +266,7 @@ function oursJev(system: string, version: number) {
     }
 
     // ours_v5: Claude chooses among the verified pages, with Jev's checks alongside, and writes the answer.
-    if (v5 && chosen) {
+    if (claudePicks && chosen) {
       const finalMsg = await client.messages.parse({
         model: MODEL,
         max_tokens: 4000,
@@ -291,7 +297,7 @@ function oursJev(system: string, version: number) {
     }
 
     // 5. The variant matching the option the task names.
-    if (!v5 && chosen && plan.option && chosen.variants.length > 1) {
+    if (!claudePicks && chosen && plan.option && chosen.variants.length > 1) {
       const res = await jev({ task: task.ques, product: chosen.title }, {
         variant: {
           type: "choice",
@@ -331,7 +337,7 @@ function oursJev(system: string, version: number) {
         `${plan.option ? `, ${plan.option}` : ""}. Matches: ${plan.must_have.join("; ") || "the request"}.` +
         `${plan.sort_by !== "featured" ? ` Chosen as the first match in ${plan.sort_by.replace(/_/g, " ")} order.` : ""}`
       : "No matching product found.";
-    if (!v5 && chosen && plan.also_report) {
+    if (!claudePicks && chosen && plan.also_report) {
       const msg = await client.messages.create({
         model: MODEL,
         max_tokens: 2000,
