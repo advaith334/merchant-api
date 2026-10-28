@@ -1,0 +1,255 @@
+[
+ {
+  "key": "ours_v6|Amazon--227",
+  "judge": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "success": true
+ },
+ {
+  "key": "ours_v11|Amazon--134",
+  "judge": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "success": true
+ },
+ {
+  "key": "ours|Amazon--227",
+  "judge": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "success": true
+ },
+ {
+  "key": "ours_v4|Amazon--339",
+  "judge": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "success": true
+ },
+ {
+  "key": "parallel|Amazon--162",
+  "judge": {
+   "attribute": true,
+   "filter": true,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "exa|Amazon--175",
+  "judge": {
+   "attribute": false,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "tavily|Amazon--328",
+  "judge": {
+   "attribute": true,
+   "filter": false,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "linkup|Amazon--123",
+  "judge": {
+   "attribute": false,
+   "filter": false
+  },
+  "success": false
+ },
+ {
+  "key": "baseline|Amazon--104",
+  "judge": {
+   "attribute": false,
+   "filter": false
+  },
+  "success": false
+ },
+ {
+  "key": "ours_v6|Amazon--89",
+  "judge": {
+   "attribute": true,
+   "filter": true
+  },
+  "success": true
+ },
+ {
+  "key": "ours_v11|Amazon--394",
+  "judge": {
+   "attribute": false,
+   "filter": true,
+   "sort": true
+  },
+  "success": false
+ },
+ {
+  "key": "ours|Amazon--281",
+  "judge": {
+   "attribute": true,
+   "filter": true,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "ours_v4|Amazon--534",
+  "judge": {
+   "attribute": false,
+   "filter": true,
+   "sort": true
+  },
+  "success": false
+ },
+ {
+  "key": "parallel|Amazon--354",
+  "judge": {
+   "attribute": true,
+   "filter": false,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "exa|Amazon--123",
+  "judge": {
+   "attribute": false,
+   "filter": false
+  },
+  "success": false
+ },
+ {
+  "key": "tavily|Amazon--576",
+  "judge": {
+   "attribute": false,
+   "filter": false,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "linkup|Amazon--363",
+  "judge": {
+   "attribute": false,
+   "filter": false
+  },
+  "success": false
+ },
+ {
+  "key": "baseline|Amazon--242",
+  "judge": {
+   "attribute": true,
+   "filter": true
+  },
+  "success": true
+ },
+ {
+  "key": "ours_v6|Amazon--338",
+  "judge": {
+   "attribute": true,
+   "filter": false
+  },
+  "success": false
+ },
+ {
+  "key": "ours_v11|Amazon--556",
+  "judge": {
+   "attribute": true,
+   "filter": false,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "ours|Amazon--272",
+  "judge": {
+   "attribute": true,
+   "filter": false
+  },
+  "success": false
+ },
+ {
+  "key": "ours_v4|Amazon--123",
+  "judge": {
+   "attribute": false,
+   "filter": true
+  },
+  "success": false
+ },
+ {
+  "key": "parallel|Amazon--20",
+  "judge": {
+   "attribute": false,
+   "filter": true
+  },
+  "success": false
+ },
+ {
+  "key": "exa|Amazon--87",
+  "judge": {
+   "attribute": true
+  },
+  "success": true
+ },
+ {
+  "key": "tavily|Amazon--302",
+  "judge": {
+   "attribute": true,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "linkup|Amazon--573",
+  "judge": {
+   "attribute": true,
+   "filter": true,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "baseline|Amazon--87",
+  "judge": {
+   "attribute": true
+  },
+  "success": true
+ },
+ {
+  "key": "ours_v6|Amazon--239",
+  "judge": {
+   "attribute": true,
+   "filter": true,
+   "sort": false
+  },
+  "success": false
+ },
+ {
+  "key": "ours_v11|Amazon--369",
+  "judge": {
+   "attribute": false,
+   "filter": false,
+   "sort": true
+  },
+  "success": false
+ },
+ {
+  "key": "ours|Amazon--137",
+  "judge": {
+   "attribute": true,
+   "filter": false
+  },
+  "success": false
+ }
+]

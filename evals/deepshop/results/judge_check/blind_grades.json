@@ -1,0 +1,255 @@
+[
+ {
+  "n": 1,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "note": "7 ports, HDMI, SD/TF, Mac-compatible, $21.99, 4.5/5858, free returns; #9 Computers & Accessories."
+ },
+ {
+  "n": 2,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "note": "24-color acrylic, canvas, beginner set, $23.99; 4.8 from 15,709 plausibly top-rated."
+ },
+ {
+  "n": 3,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": false
+  },
+  "note": "Meets specs, $16.19, 4.6/5345, free returns; only #14 in USB Hubs, Anker outsells it."
+ },
+ {
+  "n": 4,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "note": "Kyoto & Osaka guide, Oct 2024, 4.5/160, $9.98 plausibly lowest."
+ },
+ {
+  "n": 5,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": false
+  },
+  "note": "4.6/46,816 qualifies, but response admits a higher-rated 4.7 mat exists."
+ },
+ {
+  "n": 6,
+  "dims": {
+   "attribute": false,
+   "sort": false
+  },
+  "note": "Page price $159 exceeds $150 cap; only #56 in Camping Tents."
+ },
+ {
+  "n": 7,
+  "dims": {
+   "attribute": true,
+   "filter": false,
+   "sort": false
+  },
+  "note": "8mm TPE non-slip $35.99, 4.5/528; no warranty info; at rating floor, #86 Yoga Mats."
+ },
+ {
+  "n": 8,
+  "dims": {
+   "attribute": false,
+   "filter": false
+  },
+  "note": "Unavailable, no price on page; rating 4.2 below 4.5."
+ },
+ {
+  "n": 9,
+  "dims": {
+   "attribute": false,
+   "filter": false
+  },
+  "note": "Page is the new $229 listing; no Used - Good offer evidenced."
+ },
+ {
+  "n": 10,
+  "dims": {
+   "attribute": true,
+   "filter": true
+  },
+  "note": "Women's ankle Chelsea boots, first available June 2023, 1,334 ratings."
+ },
+ {
+  "n": 11,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "note": "Hardcover fantasy $22.65; 4.3/18,466; free delivery and free returns; #1 NYT bestseller, #19 Romantic Fantasy."
+ },
+ {
+  "n": 12,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "note": "Genuine leather, 2 detachable straps; 4.4, $54.99; #91 Hobo Handbags is within top 100, marginal."
+ },
+ {
+  "n": 13,
+  "dims": {
+   "attribute": false,
+   "filter": true,
+   "sort": false
+  },
+  "note": "Only 15 colors, not 24+; rating/returns fine; cheapest only because it fails color count."
+ },
+ {
+  "n": 14,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "note": "Mesh upper, $47.99; 4.5/24,682, new, FBA; low price plausible cheapest qualifying."
+ },
+ {
+  "n": 15,
+  "dims": {
+   "attribute": false,
+   "filter": false
+  },
+  "note": "Water-resistant not waterproof, $39.99 pink variant outside range; rating 4.1-4.2 below 4.5."
+ },
+ {
+  "n": 16,
+  "dims": {
+   "attribute": false,
+   "filter": false,
+   "sort": false
+  },
+  "note": "Vegan leather, beige, compartments unverified; 4.1 stars; BSR #1,733, listed 2018."
+ },
+ {
+  "n": 17,
+  "dims": {
+   "attribute": false,
+   "filter": true
+  },
+  "note": "3X available but $23.99 below $30-60 range; 4.5/396, in stock."
+ },
+ {
+  "n": 18,
+  "dims": {
+   "attribute": true,
+   "filter": true
+  },
+  "note": "6 outlets, $15.99; 4.8/67,585; Amazon-shipped free delivery eligible; free 30-day returns."
+ },
+ {
+  "n": 19,
+  "dims": {
+   "attribute": true,
+   "filter": false
+  },
+  "note": "Correct Squirrel Buster Mini, free shipping, but #106 in Wild Bird Feeders, not top 10."
+ },
+ {
+  "n": 20,
+  "dims": {
+   "attribute": true,
+   "filter": false,
+   "sort": true
+  },
+  "note": "$58.97 running shoe, 4.5/25,007, free ship/returns, but first available 2022; #3 Men's Running."
+ },
+ {
+  "n": 21,
+  "dims": {
+   "attribute": true,
+   "filter": false
+  },
+  "note": "5 bands 10-50 lb, $29.99 ok; Retrospec brand, no instruction manual listed."
+ },
+ {
+  "n": 22,
+  "dims": {
+   "attribute": false,
+   "filter": true
+  },
+  "note": "Ironman Classic 30 has no heart rate monitor; rating, reviews, free shipping fine."
+ },
+ {
+  "n": 23,
+  "dims": {
+   "attribute": false,
+   "filter": true
+  },
+  "note": "Wireless ergonomic backlit, but $64.99 exceeds $60; 4.2 stars, 1,635 reviews ok."
+ },
+ {
+  "n": 24,
+  "dims": {
+   "attribute": true
+  },
+  "note": "Bose QC Ultra earbuds, wireless with active noise cancellation, black."
+ },
+ {
+  "n": 25,
+  "dims": {
+   "attribute": true,
+   "sort": false
+  },
+  "note": "Win 11 Home, 1TB HDD, RTX 3060; $1,699 renewed not plausibly cheapest."
+ },
+ {
+  "n": 26,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": false
+  },
+  "note": "Sanderson trilogy $17.47, 4.7/33k, free ship/returns; published 2020, not last 90 days."
+ },
+ {
+  "n": 27,
+  "dims": {
+   "attribute": true
+  },
+  "note": "Soundcore Liberty 4 NC: wireless earbuds with adaptive ANC, Velvet Black."
+ },
+ {
+  "n": 28,
+  "dims": {
+   "attribute": true,
+   "filter": true,
+   "sort": true
+  },
+  "note": "Kyoto & Osaka guide, Oct 2024, 4.5/160, $9.98 plausibly lowest."
+ },
+ {
+  "n": 29,
+  "dims": {
+   "attribute": true,
+   "filter": false,
+   "sort": true
+  },
+  "note": "Meat shredder; not released in last 30 days, no warranty; #1 Meat Grinders."
+ },
+ {
+  "n": 30,
+  "dims": {
+   "attribute": true,
+   "filter": true
+  },
+  "note": "Queen blue floral quilt set, 4.6/1,295, free delivery and free returns shown."
+ }
+]

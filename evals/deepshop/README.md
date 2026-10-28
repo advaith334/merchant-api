@@ -114,6 +114,18 @@ Jev tokens are TypeSafe System One at $0.042/MTok, about $0.0015 a task.
 - Hand-grading 30 verdicts is still to do before publishing. The sheet is ready in `handgrade/`: 30 seeded-random verdicts across all nine systems, blind to the system and the judge's call. Fill in `sheet.csv` from the task and the page facts, then compare it with `key.csv` and report the agreement rate, overall and for ours vs the rest.
 - **No more tuning on these numbers.** All 140 test tasks have now been run, so any new version has no unseen tasks to be scored on. A new version needs a new test set (for example, a re-run of all systems later on the other 70 test tasks with fresh listings) before it can be quoted.
 
+### Judge check (30 verdicts from the fresh run)
+
+We drew 30 verdicts at random from the fresh run, spread evenly across the 9 systems (3–4 each). A separate grader marked each one from the same task and page data, without seeing the system name or the judge's verdict. The grades are in `results/judge_check/`.
+
+- **Agreement:** 24/30 tasks (80%), and 62/73 individual dimensions (85%).
+- **The judge is the stricter of the two.** In 5 of the 6 disagreements the judge failed a pick that the grader passed. Most were sort calls, such as "best-selling" or "cheapest", where the page gives only partial evidence.
+- **No sign the judge favors our answers.**
+  - Four disagreements involved our versions. In three of those, the judge failed our pick and the grader passed it.
+  - The one pass the grader overturned was `ours` (USB hub, "best-selling").
+  - Of the other two disagreements, the judge failed a Parallel pick the grader passed (the 5th of the five above), and the 6th was a pick both failed.
+- **Caveat:** the blind grader was also Claude, not a person. It is independent of the judge's prompt and reasoning, but not of the model family. A person should still grade these 30 before we publish.
+
 ## Publishing a result
 
 1. **Freeze the code.** Note the commit hash; no changes to any system or the judge after the test run starts.
