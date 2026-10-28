@@ -111,7 +111,8 @@ Jev tokens are TypeSafe System One at $0.042/MTok, about $0.0015 a task.
 - **What doesn't yet:** only the baseline and Linkup gaps are significant on their own (two-sided sign test, p = 0.02), and neither survives a correction for testing five competitors. Against Parallel and Exa it's a lead, not a proven win. 50 tasks is too few to separate 34% from 44%.
 - **Cheapest:** `ours_v4` matches or beats every competitor at ~1.5k Claude tokens.
 - Every system scored higher here than on the published 70, so these tasks look easier. Don't compare numbers across the two runs.
-- Hand-grading 30 verdicts is still to do before publishing.
+- Hand-grading 30 verdicts is still to do before publishing. The sheet is ready in `handgrade/`: 30 seeded-random verdicts across all nine systems, blind to the system and the judge's call. Fill in `sheet.csv` from the task and the page facts, then compare it with `key.csv` and report the agreement rate, overall and for ours vs the rest.
+- **No more tuning on these numbers.** All 140 test tasks have now been run, so any new version has no unseen tasks to be scored on. A new version needs a new test set (for example, a re-run of all systems later on the other 70 test tasks with fresh listings) before it can be quoted.
 
 ## Publishing a result
 
