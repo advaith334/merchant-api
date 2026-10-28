@@ -120,10 +120,7 @@ We drew 30 verdicts at random from the fresh run, spread evenly across the 9 sys
 
 - **Agreement:** 24/30 tasks (80%), and 62/73 individual dimensions (85%).
 - **The judge is the stricter of the two.** In 5 of the 6 disagreements the judge failed a pick that the grader passed. Most were sort calls, such as "best-selling" or "cheapest", where the page gives only partial evidence.
-- **No sign the judge favors our answers.**
-  - Four disagreements involved our versions. In three of those, the judge failed our pick and the grader passed it.
-  - The one pass the grader overturned was `ours` (USB hub, "best-selling").
-  - Of the other two disagreements, the judge failed a Parallel pick the grader passed (the 5th of the five above), and the 6th was a pick both failed.
+- **No sign the judge favors our answers.** Five of the six disagreements involved our versions. In four of them the judge failed our pick and the grader passed it. The only pass the grader overturned was `ours` (USB hub, "best-selling"). The sixth disagreement was a Parallel pick that the judge failed and the grader passed.
 - **Caveat:** the blind grader was also Claude, not a person. It is independent of the judge's prompt and reasoning, but not of the model family. A person should still grade these 30 before we publish.
 
 ## Publishing a result
