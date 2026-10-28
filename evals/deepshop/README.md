@@ -134,6 +134,21 @@ Added after the fresh run so the essay's claim (agents shopping through a browse
 - **Reported:** success with its 95% CI, median minutes, tokens and dollars per task, blocked count, and paired wins and losses against `ours_v11` and `ours_v6`.
 - **Caveat:** Amazon's live pages differ a little from the ScraperAPI copies the other systems saw, and a few hours later than the fresh run.
 
+#### Browser Use results
+
+| | Success | 95% CI | Median per task | Blocked by Amazon |
+|---|---|---|---|---|
+| Browser Use (Claude Opus 5, live browser) | 44% (22/50) | 31–58% | ~527k tokens, 2.7 min, $1.69, 16 steps | 9 of 50 |
+| `ours_v11` | 44% (22/50) | 31–58% | ~9.7k Claude tokens, 11 s | 0 |
+| `ours_v6` | 44% (22/50) | 31–58% | ~10.8k Claude tokens, 47 s | 0 |
+
+- **Accuracy is a tie.** Paired: `ours_v11` 4 wins / 4 losses, `ours_v6` 5 / 5. Browser Use beats Parallel (8 / 3) and Claude + web search (10 / 1) by a wide margin.
+- **On the 41 tasks where it wasn't blocked**, it passed 22, `ours_v11` 21 and `ours_v6` 20. When it gets in, a browser agent reading the live page is as accurate as we are.
+- **What it costs to get there:** about 50x the tokens, 15x the time and 9 of 50 tasks stopped by Amazon's bot check. The whole run cost $93 in Claude usage.
+- **Reruns:** 8 tasks hit a network outage on this machine (no result, 0 tokens) and were rerun once with the same code: Amazon--91, --281, --363, --213, --555, --576, --162, --178. One of them (Amazon--555) was blocked on the rerun and counts as a failure. Bot-checked tasks were not rerun.
+- **Caveat, in both directions:** the agent ran from a Singapore IP, so Amazon showed Singapore delivery and often SGD prices (25 of 50 answers mention it), and that may have raised its bot-check rate. The judge graded its picks on the US page like everyone else's. A US-proxy run might score it higher.
+- **What this means for the pitch:** the advantage over computer-use agents is speed, cost and not getting blocked, not accuracy. Microsoft's 11.6–32% on DeepShop came from smaller models; Browser Use on a frontier model matches us.
+
 ## Publishing a result
 
 1. **Freeze the code.** Note the commit hash; no changes to any system or the judge after the test run starts.
