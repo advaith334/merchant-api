@@ -69,6 +69,27 @@ The intervals overlap, so lead with the paired comparison. Over the same 70 task
 
 Five versions of ours ran on this sample, each frozen first and run once: `ours` (before the test run), `ours_v4` (fbbf7d2), `ours_v6` (f1e266b), `ours_v9` (804d5a9) and `ours_v10` (25d70a6). Report all five. `ours_v9` ran from cached Amazon data only. 18 tasks needed searches or pages that weren't cached, so it finished 52 of 70. On those 52 it passed 14 at ~1.5k Claude tokens, against `ours_v6` 21 (2 wins, 9 losses), `ours` 16, `ours_v4` 16 and Parallel 17. Letting Jev make the final pick costs accuracy, so Claude's final choice is worth its tokens. `ours_v10` lets Jev make the pick only when its top page passes every check, and calls Claude otherwise. It also ran from cache and finished 49 of 70. On those 49 it passed 14 at ~7.5k mean Claude tokens, against `ours_v6` 19 (0 wins, 5 losses). Jev's confident picks were wrong often enough that skipping Claude doesn't pay. On the 23 tuning tasks it had looked better (12 vs 11 at about half the tokens), which shows how little 23 tasks can resolve. `ours_v5`–`ours_v7` were tuned on the 10 dev tasks and 20 unpublished test tasks (`--test --offset 70 --sample 20`). On those 30 tasks, under judge v2, `ours` passes 8, `ours_v5` 11, `ours_v6` 12 and `ours_v7` 11. `ours_v6` was chosen for the published run on that basis. `ours_v8` (`ours_v6` without the structured fields the full page repeats) ran afterwards from cached Amazon data only. On the 28 of those tasks it could judge, it cut median tokens from ~10.3k to ~9.6k and passed 10 to `ours_v6`'s 11, with the same pick on 22. `ours_v9` (`ours_v6`'s full pages, but Jev picks and a template writes the answer, as in `ours_v4`) also ran from cache. On the 25 tasks every version could judge, it passed 10 at ~2.3k Claude tokens, against `ours_v4` 10, `ours_v6` 11 and `ours` 8. `ours_v8` has not run on the published sample. At this size the versions are within one or two tasks of each other, so separating them needs a larger tuning set.
 
+## Fresh-task run (pre-registered 2026-10-28, before any system ran on these tasks)
+
+The published 70 has now seen five versions of ours, and the judge changed (v1 to v2) after we had seen results. So treat its numbers as exploratory. This run is the one to quote. Everything below was committed before the run started.
+
+- **Tasks:** `--test --offset 90 --sample 50`: the 50 test tasks after the published 70 and the 20 tuning tasks in the hash order. No system had run on them before this commit.
+- **Code and judge:** frozen at this commit. Judge v2 is unchanged and gets the same page data for every system.
+- **Systems, in run order:**
+  - Primary: `ours_v6`, Parallel, Exa, baseline.
+  - Secondary: `ours_v11` (`ours_v6` without repeated page data, final pick at low effort), `ours`, `ours_v4`, Tavily, Linkup.
+  - Everything that runs is reported. If ScraperAPI credits run out, systems not yet run are listed as not run, and unfinished tasks count as failures.
+- **Metric:** success over all 50 tasks, unanswered tasks counted as failures, with 95% Wilson intervals. Median Claude tokens per task; Jev tokens reported separately.
+- **Primary comparison:** paired wins and losses, `ours_v6` against each competitor on the same tasks.
+- **Reruns:** only tasks that failed on infrastructure errors (timeouts, rate limits), with the same code. Each rerun is listed.
+- **No changes** to any system or the judge until every system has run and been judged.
+
+Known risks to the claim, stated up front:
+
+- `ours_v6` reads the same page sections the judge reads. That's real product data any shopper would see, but it's also the judge's evidence.
+- The judge is Claude Opus 5.5, the same model our pipeline uses, so it may favor our answers. Hand-grade 30 random verdicts across systems and report the agreement rate before publishing.
+- A different Amazon data source (Rainforest) changes everyone's scores; compare within this run only.
+
 ## Publishing a result
 
 1. **Freeze the code.** Note the commit hash; no changes to any system or the judge after the test run starts.

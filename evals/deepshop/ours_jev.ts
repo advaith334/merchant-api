@@ -38,6 +38,9 @@
 // ours_v10 is ours_v6 when Jev is unsure and ours_v9 when it is sure: if Jev's top page passes
 // every filter and every check at VERIFIED, it is the answer (template, no final Claude call);
 // otherwise Claude chooses among the pages as in ours_v6.
+//
+// ours_v11 is ours_v8 (no repeated page data) with the final choice at low effort, for fewer
+// tokens while keeping Claude's final pick, which every Jev-only variant lost accuracy without.
 
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
@@ -103,6 +106,7 @@ export const runOursV7 = oursJev("ours_v7", 7);
 export const runOursV8 = oursJev("ours_v8", 8);
 export const runOursV9 = oursJev("ours_v9", 9);
 export const runOursV10 = oursJev("ours_v10", 10);
+export const runOursV11 = oursJev("ours_v11", 11);
 
 /** ours_v8: a page without the structured fields its full-page text already covers. */
 function lean(page: any) {
@@ -117,7 +121,7 @@ function lean(page: any) {
 }
 
 function oursJev(system: string, version: number) {
-  const v2 = version >= 2, v3 = version >= 3, v4 = version === 4, v5 = version >= 5, v6 = version >= 6, v7 = version === 7, v8 = version === 8;
+  const v2 = version >= 2, v3 = version >= 3, v4 = version === 4, v5 = version >= 5, v6 = version >= 6, v7 = version === 7, v8 = version === 8 || version === 11;
   const claudePicks = v5 && version !== 9;
   return async function run(task: Task): Promise<Answer> {
     const t0 = Date.now();
@@ -277,7 +281,7 @@ function oursJev(system: string, version: number) {
       const finalMsg = await client.messages.parse({
         model: MODEL,
         max_tokens: 4000,
-        output_config: { effort: "medium", format: zodOutputFormat(FinalV5) },
+        output_config: { effort: version === 11 ? "low" : "medium", format: zodOutputFormat(FinalV5) },
         messages: [{
           role: "user",
           content: `Task: ${task.ques}\n\nCandidate product pages, best first by our checks:\n` +
