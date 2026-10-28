@@ -120,13 +120,24 @@ function lean(page: any) {
   };
 }
 
+/** One step of a run, for the live demo (demo.ts); runs without a listener behave exactly as before. */
+export type Step = { ms: number; claudeTokens: number; jevTokens: number } & (
+  | { kind: "plan"; plan: any }
+  | { kind: "search"; term: string; sort_by: string; results: number }
+  | { kind: "checked"; total: number; top: { r: any; type: number; checks: (readonly [string, number])[] }[] }
+  | { kind: "page"; r: any; type: number; checks: (readonly [string, number])[] }
+  | { kind: "answer"; asin: string | null; response: string }
+);
+type StepBody = Step extends infer S ? S extends any ? Omit<S, "ms" | "claudeTokens" | "jevTokens"> : never : never;
+
 function oursJev(system: string, version: number) {
   const v2 = version >= 2, v3 = version >= 3, v4 = version === 4, v5 = version >= 5, v6 = version >= 6, v7 = version === 7, v8 = version === 8 || version === 11;
   const claudePicks = v5 && version !== 9;
-  return async function run(task: Task): Promise<Answer> {
+  return async function run(task: Task, onStep?: (step: Step) => void): Promise<Answer> {
     const t0 = Date.now();
     let input = 0, output = 0, calls = 0, jevTokens = 0;
     const tally = (m: Parameters<typeof usageOf>[0]) => { const u = usageOf(m); input += u.input; output += u.output; };
+    const emit = (step: StepBody) => onStep?.({ ...step, ms: Date.now() - t0, claudeTokens: input + output, jevTokens } as Step);
 
     // 1. Compile the request (Claude: it has to write a search term).
     const planMsg = await client.messages.parse({
@@ -137,6 +148,7 @@ function oursJev(system: string, version: number) {
     });
     tally(planMsg);
     const plan: z.infer<typeof PlanV7> = { released_within_days: null, must_match: [], second_product: null, ...planMsg.parsed_output! };
+    emit({ kind: "plan", plan });
 
     /**
      * Separate Jev questions about one product: the right kind of product, each required attribute,
@@ -201,6 +213,7 @@ function oursJev(system: string, version: number) {
       for (const r of (data.search_results ?? []).map(trimSearchResult)) {
         if (r.asin && !seen.has(r.asin)) { seen.add(r.asin); all.push(r); }
       }
+      emit({ kind: "search", term: search_term, sort_by, results: all.length });
     };
     // ours_v2: newest first when the task asks for recent releases.
     const sort = v2 && plan.sort_by === "featured" && plan.released_within_days != null ? "most_recent" : plan.sort_by;
@@ -229,6 +242,7 @@ function oursJev(system: string, version: number) {
       const added = await Promise.all(all.slice(before).map(async (r) => ({ r, ...(await check(r)) })));
       checked = order([...checked, ...added]);
     }
+    emit({ kind: "checked", total: checked.length, top: pick(checked).slice(0, 8) });
     const shortlist = pick(checked).slice(0, v5 ? V5_PAGES : PAGES).map((c) => c.r.asin as string);
 
     // 4. Verify on product pages: Jev checks attributes, our code checks filters on the page's own numbers.
@@ -244,6 +258,7 @@ function oursJev(system: string, version: number) {
       const { variants, ...product } = page;
       const checked = { r: page, ...(await check(product)) };
       pages.push(checked);
+      emit({ kind: "page", ...checked });
       if (v4 && page.asin && failures(page) === 0 && checked.type >= VERIFIED && checked.checks.every(([, p]) => p >= VERIFIED)) break;
     }
     const ranked = pick(pages.filter((p) => p.r?.asin));
@@ -364,6 +379,7 @@ function oursJev(system: string, version: number) {
       response += " " + msg.content.filter((b) => b.type === "text").map((b) => b.text).join("");
     }
 
+    emit({ kind: "answer", asin, response });
     return {
       taskId: task.id,
       system,

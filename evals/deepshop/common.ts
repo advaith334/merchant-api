@@ -47,6 +47,8 @@ export function asinFromUrl(url: string | null | undefined): string | null {
 // credits are scarce and re-runs while tuning should cost nothing.
 
 export const AMAZON_DATA = process.env.AMAZON_DATA === "scraperapi" ? "scraperapi" : "rainforest";
+/** EVAL_FRESH=1 skips cached responses (and refreshes them), so a demo shows live timing. */
+const FRESH = process.env.EVAL_FRESH === "1";
 let liveCalls = 0;
 export const amazonLiveCalls = () => liveCalls;
 /** AMAZON_MAX_LIVE_CALLS caps uncached Amazon lookups per run, so an experiment can't spend a free tier's last credits. */
@@ -103,7 +105,7 @@ function cached(source: string, params: Record<string, string>) {
   const dir = new URL(`../.cache/${source}/`, import.meta.url);
   const file = new URL(`${id}.json`, dir);
   return {
-    get: () => (existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : undefined),
+    get: () => (!FRESH && existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : undefined),
     set: (data: unknown) => { mkdirSync(dir, { recursive: true }); writeFileSync(file, JSON.stringify(data)); },
   };
 }
@@ -355,7 +357,7 @@ export async function postJson(api: string, url: string, headers: Record<string,
   const id = createHash("sha256").update(url + JSON.stringify(body)).digest("hex").slice(0, 24);
   const dir = new URL(`${api}/`, API_CACHE_DIR);
   const file = new URL(`${id}.json`, dir);
-  if (cache && existsSync(file)) return JSON.parse(readFileSync(file, "utf8"));
+  if (cache && !FRESH && existsSync(file)) return JSON.parse(readFileSync(file, "utf8"));
 
   const res = await fetch(url, {
     method: "POST",

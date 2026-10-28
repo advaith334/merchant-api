@@ -203,6 +203,13 @@ node --env-file=.env evals/deepshop/run.ts --pilot --system channel3,shopify_cat
 node --env-file=.env evals/deepshop/run.ts --pilot --report   # print the table without running
 ```
 
+For a video demo, `demo.ts` runs one request and prints each step live (the plan, every result's checks, the product pages, the pick) with a clock and token count; run `--system baseline` in a second terminal for Claude with web search. `--fresh` skips cached responses so the timing is live:
+
+```bash
+node --env-file=.env evals/deepshop/demo.ts --fresh --task Amazon--128
+node --env-file=.env evals/deepshop/demo.ts --system baseline --task Amazon--128
+```
+
 The adjacent-product systems also need the keys in the table above; `--system all` skips any whose keys are missing and says so.
 
 Browser Use runs from Python (3.12) with its own Chromium:
