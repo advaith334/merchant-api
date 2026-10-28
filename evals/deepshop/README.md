@@ -90,6 +90,22 @@ Known risks to the claim, stated up front:
 - The judge is Claude Opus 5.5, the same model our pipeline uses, so it may favor our answers. Hand-grade 30 random verdicts across systems and report the agreement rate before publishing.
 - A different Amazon data source (Rainforest) changes everyone's scores; compare within this run only.
 
+### Fresh-run results (frozen at d93daa1, judge v2, 50 tasks)
+
+| System | Success | 95% CI | Median tokens/task | `ours_v6` wins / losses |
+|---|---|---|---|---|
+| `ours_v6` | 44% | 31–58% | ~10.8k Claude (+ Jev) | |
+| `ours_v11` | 42% (48/50 answered) | 29–56% | ~9.7k | 2 / 2 |
+| `ours_v4` | 36% | 24–50% | ~1.5k | 6 / 2 |
+| Parallel | 34% | 22–48% | ~33.8k | 10 / 5 |
+| `ours` | 32% | 21–46% | ~7.2k | 8 / 2 |
+| Exa | 32% | 21–46% | ~24.7k | 8 / 2 |
+| Tavily | 30% | 19–44% | ~39.2k | 10 / 3 |
+| Baseline (Claude + web search) | 26% | 16–40% | ~101.8k | 11 / 2 |
+| Linkup | 26% | 16–40% | ~44.4k | 11 / 2 |
+
+No reruns were needed. `ours_v11` left 2 tasks unanswered, counted as failures. The intervals overlap, so the defensible claim is the paired one: `ours_v6` wins more tasks than it loses against every competitor, at 2–10x fewer tokens. Hand-grading 30 verdicts is still to do before publishing.
+
 ## Publishing a result
 
 1. **Freeze the code.** Note the commit hash; no changes to any system or the judge after the test run starts.
