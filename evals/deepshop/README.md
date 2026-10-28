@@ -123,6 +123,17 @@ We drew 30 verdicts at random from the fresh run, spread evenly across the 9 sys
 - **No sign the judge favors our answers.** Five of the six disagreements involved our versions. In four of them the judge failed our pick and the grader passed it. The only pass the grader overturned was `ours` (USB hub, "best-selling"). The sixth disagreement was a Parallel pick that the judge failed and the grader passed.
 - **Caveat:** the blind grader was also Claude, not a person. It is independent of the judge's prompt and reasoning, but not of the model family. A person should still grade these 30 before we publish.
 
+### Computer-use baseline: Browser Use (pre-registered 2026-10-28, added after the fresh run)
+
+Added after the fresh run so the essay's claim (agents shopping through a browser) is measured on the same footing. Committed before it ran.
+
+- **System:** Browser Use 0.13.14 (`browser_use/run.py`), a real headless Chromium on live amazon.com, up to 40 steps, one task at a time. It runs on `claude-opus-5` because browser-use 0.13 can't drive Opus 5.5 (it forces a tool choice Opus 5.5 rejects).
+- **Tasks and judge:** the same 50 fresh tasks and the same judge v2 on ScraperAPI page data. No change to any of our systems or the judge.
+- **Scoring:** success over all 50. A CAPTCHA or bot check (the agent is told not to solve it), a step-limit stop or no product counts as a failure.
+- **Reruns:** only browser start-up or network failures, once, with the same code; each listed. Blocked tasks are not rerun.
+- **Reported:** success with its 95% CI, median minutes, tokens and dollars per task, blocked count, and paired wins and losses against `ours_v11` and `ours_v6`.
+- **Caveat:** Amazon's live pages differ a little from the ScraperAPI copies the other systems saw, and a few hours later than the fresh run.
+
 ## Publishing a result
 
 1. **Freeze the code.** Note the commit hash; no changes to any system or the judge after the test run starts.

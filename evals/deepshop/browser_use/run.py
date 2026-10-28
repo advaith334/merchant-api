@@ -1,8 +1,8 @@
 """Browser Use baseline: an open-source browser agent (Claude driving a real
 headless Chromium) shopping on live Amazon, the way DeepShop's web agents do.
 
-Writes answers in the same shape as run.ts to results/answers.jsonl with
-system "browser_use"; judge them with `run.ts --judge-pending`.
+Writes answers in the same shape as run.ts to results/answers.jsonl (results/scraperapi/
+with AMAZON_DATA=scraperapi) with system "browser_use"; judge them with `run.ts --judge-pending`.
 
 Usage: python evals/deepshop/browser_use/run.py [--pilot] [--ids Amazon--31,...] [--max-steps 40]
 Needs ANTHROPIC_API_KEY. If Amazon shows a CAPTCHA the agent must not solve it;
@@ -22,7 +22,9 @@ from browser_use.llm import ChatAnthropic
 
 HERE = Path(__file__).resolve().parent.parent
 TASKS = HERE / "tasks.jsonl"
-ANSWERS = HERE / "results" / "answers.jsonl"
+# Same results directory as run.ts: AMAZON_DATA=scraperapi writes to results/scraperapi/.
+_DATA = os.environ.get("AMAZON_DATA", "rainforest")
+ANSWERS = HERE / "results" / ("" if _DATA == "rainforest" else _DATA) / "answers.jsonl"
 # browser-use 0.13 forces tool_choice on every step, which Opus 5.5 rejects (400) and
 # ignores in auto mode, so the browser agent runs on the previous Opus with API thinking off.
 # use_thinking=False drops browser-use's "thinking" output field, which Opus 5 refuses to fill.
