@@ -92,19 +92,26 @@ Known risks to the claim, stated up front:
 
 ### Fresh-run results (frozen at d93daa1, judge v2, 50 tasks)
 
-| System | Success | 95% CI | Median tokens/task | `ours_v6` wins / losses |
-|---|---|---|---|---|
-| `ours_v6` | 44% | 31–58% | ~10.8k Claude (+ Jev) | |
-| `ours_v11` | 42% (48/50 answered) | 29–56% | ~9.7k | 2 / 2 |
-| `ours_v4` | 36% | 24–50% | ~1.5k | 6 / 2 |
-| Parallel | 34% | 22–48% | ~33.8k | 10 / 5 |
-| `ours` | 32% | 21–46% | ~7.2k | 8 / 2 |
-| Exa | 32% | 21–46% | ~24.7k | 8 / 2 |
-| Tavily | 30% | 19–44% | ~39.2k | 10 / 3 |
-| Baseline (Claude + web search) | 26% | 16–40% | ~101.8k | 11 / 2 |
-| Linkup | 26% | 16–40% | ~44.4k | 11 / 2 |
+| System | Success | 95% CI | Median tokens/task | `ours_v6` wins / losses | Sign test p |
+|---|---|---|---|---|---|
+| `ours_v6` | 44% | 31–58% | ~10.8k Claude + ~36k Jev | | |
+| `ours_v11` | 44% | 31–58% | ~9.7k Claude + ~35k Jev | 2 / 2 | |
+| `ours_v4` | 36% | 24–50% | ~1.5k Claude + ~31k Jev | 6 / 2 | |
+| Parallel | 34% | 22–48% | ~33.8k | 10 / 5 | 0.30 |
+| `ours` | 32% | 21–46% | ~7.2k | 8 / 2 | |
+| Exa | 32% | 21–46% | ~24.7k | 8 / 2 | 0.11 |
+| Tavily | 30% | 19–44% | ~39.2k | 10 / 3 | 0.09 |
+| Baseline (Claude + web search) | 26% | 16–40% | ~101.8k | 11 / 2 | 0.02 |
+| Linkup | 26% | 16–40% | ~44.4k | 11 / 2 | 0.02 |
 
-No reruns were needed. `ours_v11` left 2 tasks unanswered, counted as failures. The intervals overlap, so the defensible claim is the paired one: `ours_v6` wins more tasks than it loses against every competitor, at 2–10x fewer tokens. Hand-grading 30 verdicts is still to do before publishing.
+Jev tokens are TypeSafe System One at $0.042/MTok, about $0.0015 a task.
+
+- **Reruns:** two `ours_v11` tasks (Amazon--128, Amazon--555) timed out on the first pass and were rerun once with the same code. No other reruns.
+- **What holds up:** `ours_v6` wins more tasks than it loses against every competitor, at 2–10x fewer Claude tokens. `ours_v11` and `ours_v4` do too, except `ours_v4` vs Parallel (8 / 7).
+- **What doesn't yet:** only the baseline and Linkup gaps are significant on their own (two-sided sign test, p = 0.02), and neither survives a correction for testing five competitors. Against Parallel and Exa it's a lead, not a proven win. 50 tasks is too few to separate 34% from 44%.
+- **Cheapest:** `ours_v4` matches or beats every competitor at ~1.5k Claude tokens.
+- Every system scored higher here than on the published 70, so these tasks look easier. Don't compare numbers across the two runs.
+- Hand-grading 30 verdicts is still to do before publishing.
 
 ## Publishing a result
 
